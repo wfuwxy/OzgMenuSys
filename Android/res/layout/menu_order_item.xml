@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:id="@+id/menu_order_item_root" >
+    
+	<TextView
+         android:layout_width="wrap_content"
+         android:layout_height="35dp"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentTop="true"
+         android:layout_marginLeft="20dp"
+         android:layout_marginTop="15dp"
+         android:textSize="18sp"
+         android:id="@+id/menu_order_item_name" />
+     
+	 <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="35dp"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentTop="true"
+         android:layout_marginLeft="248dp"
+         android:layout_marginTop="15dp"
+         android:textSize="18sp"
+         android:id="@+id/menu_order_item_quantity" />
+	
+     <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="35dp"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentTop="true"
+         android:layout_marginLeft="325dp"
+         android:layout_marginTop="15dp"
+         android:textSize="18sp"
+         android:id="@+id/menu_order_item_price" />
+     
+     <TextView
+         android:layout_width="wrap_content"
+         android:layout_height="35dp"
+         android:layout_alignParentLeft="true"
+         android:layout_alignParentTop="true"
+         android:layout_marginLeft="415dp"
+         android:layout_marginTop="15dp"
+         android:textSize="18sp"
+         android:id="@+id/menu_order_item_time" />
+        
+</RelativeLayout>

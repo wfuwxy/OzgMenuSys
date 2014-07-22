@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/menu_root" >
+
+    <RelativeLayout
+        android:id="@+id/menu_left"
+        android:layout_width="300dip"
+        android:layout_height="match_parent" >
+
+        <ScrollView
+            android:id="@+id/menu_class_sv"
+            android:layout_width="180dip"
+            android:layout_height="325dip"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:scrollbars="none"
+	    	android:fadingEdge="none" >
+
+            <LinearLayout
+                android:id="@+id/menu_class_sv_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+                                
+            </LinearLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/lab_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="65dp"
+            android:layout_marginTop="10dp"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btn_order"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="14dp"
+            android:layout_marginTop="40dp"
+            android:textSize="20sp"
+            android:text="@string/menu_btn_order"
+            android:clickable="false" />
+
+        <Button
+            android:id="@+id/btn_payment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="104dp"
+            android:layout_marginTop="40dp"
+            android:textSize="20sp"
+            android:text="@string/menu_btn_payment"
+            android:clickable="false" />
+
+    </RelativeLayout>    
+    
+</RelativeLayout>
