@@ -1,7 +1,7 @@
 ozg 点餐系统
 ================
 
-本系统只适用于局域网，客户端需要设置固定IP，每一个客户端的IP对应服务端数据库client表的一条数据。
+本系统只适用于局域网和平板客户端（平板替代纸质菜单）的场合，客户端需要设置固定IP，每一个客户端的IP对应服务端数据库client表的一条数据。
 
 服务器端使用nodejs + sqlite3 + websocket，详情请查看node_modules目录，服务器启动：cd OzgMenuSys/Server， node main.js。
 
