@@ -15,6 +15,6 @@ node test.js是暂时代替没有做的服务台端的，主要测试服务台�
 
 
 运行状况：
-![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot1.png)
+![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot1.jpg)
 
-![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot2.png)
+![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot2.jpg)
