@@ -13,6 +13,7 @@ var chkClientSql2 = "select * from client where ip = '{0}'"; //检测订单是�
 
 var clientList = null;
 
+//公用方法不用exports
 function writeErrorIp(connection) {
 	console.log("查询不到ip为" + connection.remoteAddress + "的数据");
 			
@@ -22,6 +23,7 @@ function writeErrorIp(connection) {
 	connection.close();
 }
 
+//公用方法不用exports
 function writeDbData(connection, sql) {
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
@@ -42,7 +44,7 @@ function writeDbData(connection, sql) {
 }
 
 //有链接时调用
-function checkClient(connection) {
+exports.checkClient = function(connection) {
 	
 	db.get("select * from client where ip = '" + connection.remoteAddress + "'", function(err, row) {
 		if(row != undefined && row) {
@@ -75,19 +77,19 @@ function checkClient(connection) {
 }
 
 //获取菜单分类列表
-function getMenuClassList(connection) {
+exports.getMenuClassList = function(connection) {
 	var sql = "select * from menu_class order by id desc, sort desc";
 	writeDbData(connection, sql);
 }
 
 //获取一个菜单分类下面的菜单列表
-function getMenuList(connection, dataId) {
+exports.getMenuList = function(connection, dataId) {
 	var sql = "select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.class_id = " + dataId + " order by m.id desc, m.sort desc";
 	writeDbData(connection, sql);	
 }
 
 //获取一个菜单的详细数据
-/*function getMenuDetail(connection, dataId) {	
+/*exports.getMenuDetail = function(connection, dataId) {	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
 			
@@ -107,7 +109,7 @@ function getMenuList(connection, dataId) {
 
 }*/
 
-//获取一个图片
+//获取一个图片（公用方法不用exports）
 function getMenuImage(connection, dataId, isSmall) {
 	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
@@ -140,21 +142,21 @@ function getMenuImage(connection, dataId, isSmall) {
 }
 
 //获取一个小图
-function getMenuSmallImage(connection, dataId) {
+exports.getMenuSmallImage = function(connection, dataId) {
 	
 	getMenuImage(connection, dataId, true);
 
 }
 
 //获取一个大图
-function getMenuBigImage(connection, dataId) {
+exports.getMenuBigImage = function(connection, dataId) {
 	
 	getMenuImage(connection, dataId, false);
 
 }
 
 //点菜
-function addOrderDetail(connection, menuId, quantity) {
+exports.addOrderDetail = function(connection, menuId, quantity) {
 	
 	if(quantity == undefined || quantity == 0)
 		quantity = 1;
@@ -188,14 +190,14 @@ function addOrderDetail(connection, menuId, quantity) {
 }
 
 //获取当前客户端的订单列表
-function getOrderList(connection) {
+exports.getOrderList = function(connection) {
 	
 	var sql = "select od.*, o.update_time as o_update_time from order_detail as od left join `order` as o on od.order_id = o.id left join client as c on o.client_id = c.id where c.ip = '" + connection.remoteAddress + "' and o.status = 0";
 	writeDbData(connection, sql);
 }
 
 //当前客户端结帐
-function orderPayment(connection) {
+exports.orderPayment = function(connection) {
 
 	//订单状态：0正在消费，1结帐中，2完成订单
 	
@@ -233,7 +235,7 @@ function orderPayment(connection) {
 
 }
 
-function isEndClient(connection) {
+exports.isEndClient = function(connection) {
 	//检测订单是否已归档
 	db.get(commons.format(chkClientSql2, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
@@ -261,7 +263,7 @@ function isEndClient(connection) {
 	});
 }
 
-function openClient(connection, targetClientIp) {
+exports.openClient = function(connection, targetClientIp) {
 	//服务台开通一个客户端
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
@@ -312,7 +314,7 @@ function openClient(connection, targetClientIp) {
 	});
 }
 
-function closeClient(connection, targetClientIp) {
+exports.closeClient = function(connection, targetClientIp) {
 	//服务台归档一个客户端
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
@@ -359,16 +361,3 @@ function closeClient(connection, targetClientIp) {
 exports.setClientList = function(pClientList) {
 	clientList = pClientList;
 };
-
-exports.checkClient = checkClient;
-exports.getMenuClassList = getMenuClassList;
-exports.getMenuList = getMenuList;
-//exports.getMenuDetail = getMenuDetail;
-exports.getMenuSmallImage = getMenuSmallImage;
-exports.getMenuBigImage = getMenuBigImage;
-exports.addOrderDetail = addOrderDetail;
-exports.getOrderList = getOrderList;
-exports.orderPayment = orderPayment;
-exports.isEndClient = isEndClient;
-exports.openClient = openClient;
-exports.closeClient = closeClient;
