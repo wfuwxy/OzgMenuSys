@@ -224,22 +224,17 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					
 		try {
 			if((Activity)this.mContext instanceof MainActivity) {
-				data.put("cmd", AppConfig.SERV_CHK_CLIENT);
-	        	((MainActivity)this.mContext).mConnection.sendTextMessage(data.toString());
-			}
-			else if((Activity)this.mContext instanceof MenuActivity) {
-				
-				data.put("cmd", ((MenuActivity)this.mContext).mCmd);
-				((MenuActivity)this.mContext).mConnection.sendTextMessage(data.toString());
+				data.put("cmd", AppConfig.SERV_CHK_CLIENT);				
+				ConnHelper.getConnInstance(this.mContext).sendTextMessage(data.toString());
 			}
         	
 		} catch (JSONException e) {
 			e.printStackTrace();
 			
 			if((Activity)this.mContext instanceof MainActivity)
-				((MainActivity)this.mContext).mConnection.disconnect();
+				ConnHelper.getConnInstance(this.mContext).disconnect();
 			else if((Activity)this.mContext instanceof MenuActivity)
-				((MenuActivity)this.mContext).mConnection.disconnect();
+				ConnHelper.getConnInstance(this.mContext).disconnect();
 			
 		}
 
@@ -265,11 +260,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					Editor editor = sp.edit();
 					editor.putString(AppConfig.CLIENT_DATA, data.getJSONObject("data").toString());
 					editor.commit();
-					
-					((MainActivity)this.mContext).mConnection.disconnect();
-					((MainActivity)this.mContext).mConnection = null;
-					((MainActivity)this.mContext).mHandler = null;
-					
+										
 					Intent intent = new Intent();					
 	                intent.setClass((MainActivity)this.mContext, MenuActivity.class);
 	                ((MainActivity)this.mContext).startActivityForResult(intent, 1);
@@ -294,7 +285,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 			} catch (JSONException e) {
 				Log.d("ozgtest", e.toString());
 				
-				((MainActivity)this.mContext).mConnection.disconnect();
+				ConnHelper.getConnInstance(this.mContext).disconnect();
 			}
 		}
 		else if((Activity)this.mContext instanceof MenuActivity) {
@@ -347,7 +338,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					
 				} catch (JSONException e) {
 
-					((MenuActivity)this.mContext).mConnection.disconnect();
+					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
 			}
 			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_LIST)) {
@@ -406,7 +397,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					
 				} catch (JSONException e) {
 
-					((MenuActivity)this.mContext).mConnection.disconnect();
+					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
 				
 				((MenuActivity)this.mContext).enabledView(true);
@@ -507,7 +498,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					
 				} catch (JSONException e) {
 					
-					((MenuActivity)this.mContext).mConnection.disconnect();
+					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
 				
 				((MenuActivity)this.mContext).enabledView(true);
@@ -564,7 +555,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 										
 				} catch (JSONException e) {
 
-					((MenuActivity)this.mContext).mConnection.disconnect();
+					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
 								
 			}
@@ -585,7 +576,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					
 				} catch (JSONException e) {
 					
-					((MenuActivity)this.mContext).mConnection.disconnect();
+					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}				
 			}
 			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_PAYMENT)) {
@@ -635,7 +626,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					
 				} catch (JSONException e) {
 					
-					((MenuActivity)this.mContext).mConnection.disconnect();
+					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
 			}
 			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ISEND_CLIENT)) {
@@ -651,7 +642,6 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						}
 						
 						//回到第一个界面
-						((MenuActivity)this.mContext).mConnection.disconnect();
 						((MenuActivity)this.mContext).finish();
 					}
 					else {

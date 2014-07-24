@@ -1,8 +1,12 @@
 package com.ozg.ozgmenusys;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import de.tavendo.autobahn.WebSocketConnection;
 import de.tavendo.autobahn.WebSocketException;
 import de.tavendo.autobahn.WebSocketOptions;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,8 +26,16 @@ public class MainActivity extends BaseActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
+
+		JSONObject jsonData = new JSONObject();		
+		try {
+			jsonData.put("cmd", AppConfig.SERV_CHK_CLIENT);				
+			ConnHelper.getConnInstance(this).sendTextMessage(jsonData.toString());
+        	
+		} catch (JSONException e) {
+			e.printStackTrace();			
+		}
 		
-		this.connect();
 	}
 	
 	@Override
@@ -51,30 +63,25 @@ public class MainActivity extends BaseActivity {
 			TextView labMsg = (TextView)this.findViewById(R.id.main_lab_msg);
 			labMsg.setTextSize(24.0f);
 			
-			Button btn = (Button)this.findViewById(R.id.main_btn);
-			btn.setGravity(View.GONE);
-			btn.setTextSize(24.0f);
-			btn.setOnClickListener(new OnClickListener() {
-	
-				@Override
-				public void onClick(View v) {
-										
-					SharedPreferences sp = MainActivity.this.getSharedPreferences(AppConfig.APP_DATA, Context.MODE_PRIVATE);
-					
-					if(MainActivity.this.mConnection.isConnected() && sp.contains(AppConfig.CLIENT_DATA)) {
+//			Button btn = (Button)this.findViewById(R.id.main_btn);
+//			btn.setGravity(View.GONE);
+//			btn.setTextSize(24.0f);
+//			btn.setOnClickListener(new OnClickListener() {
+//	
+//				@Override
+//				public void onClick(View v) {
+//										
+//					SharedPreferences sp = MainActivity.this.getSharedPreferences(AppConfig.APP_DATA, Context.MODE_PRIVATE);					
+//					if(ConnHelper.getConnInstance(MainActivity.this).isConnected() && sp.contains(AppConfig.CLIENT_DATA)) {
 //						Log.d("ozgtest", "进入菜单界面");
-						
-						MainActivity.this.toMainActivity();		
-					}
-					else {
-						MainActivity.this.connect();
-					}
-					
-				}
-			});
+//
+//					}
+//					
+//				}
+//			});
 			
 			//socket相关
-			this.connect();
+			ConnHelper.getConnInstance(this);
 	    }
 	    else if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
 	        //当前为竖屏， 在此处添加额外的处理代码

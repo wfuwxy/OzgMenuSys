@@ -91,7 +91,16 @@ public class MenuActivity extends BaseActivity {
 	public void getMenuClassList() {
 
 		this.mCmd = AppConfig.SERV_MENU_CLASS_LIST;
-		this.connect();
+				
+		JSONObject sendData = new JSONObject();
+		try {
+			sendData.put("cmd", this.mCmd);
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
+		} catch (JSONException e) {
+
+			e.printStackTrace();
+		}
+		
 	}
 	
 	public void getMenuList(int dataId) {
@@ -100,7 +109,7 @@ public class MenuActivity extends BaseActivity {
 		try {
 			sendData.put("data", dataId);
 			sendData.put("cmd", this.mCmd);
-			this.mConnection.sendTextMessage(sendData.toString());
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
 
@@ -115,7 +124,7 @@ public class MenuActivity extends BaseActivity {
 		JSONObject sendData = new JSONObject();
 		try {
 			sendData.put("cmd", this.mCmd);
-			this.mConnection.sendTextMessage(sendData.toString());
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
 
@@ -130,7 +139,7 @@ public class MenuActivity extends BaseActivity {
 		try {
 			sendData.put("data", dataId);
 			sendData.put("cmd", this.mCmd);
-			this.mConnection.sendTextMessage(sendData.toString());
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
 
@@ -160,7 +169,7 @@ public class MenuActivity extends BaseActivity {
 			
 			sendData.put("data", data);
 			sendData.put("cmd", this.mCmd);			
-			this.mConnection.sendTextMessage(sendData.toString());
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
 
@@ -174,7 +183,7 @@ public class MenuActivity extends BaseActivity {
 		try {
 			
 			sendData.put("cmd", this.mCmd);			
-			this.mConnection.sendTextMessage(sendData.toString());
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
 
@@ -189,7 +198,7 @@ public class MenuActivity extends BaseActivity {
 		try {
 			
 			sendData.put("cmd", this.mCmd);			
-			this.mConnection.sendTextMessage(sendData.toString());
+			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
 

@@ -23,6 +23,7 @@
         android:layout_below="@+id/main_lab_msg"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="22dp"
+        android:visibility="gone"
         android:text="@string/main_btn_text3" />
 
 </RelativeLayout>
