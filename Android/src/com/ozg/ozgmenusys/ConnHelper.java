@@ -13,8 +13,8 @@ import de.tavendo.autobahn.WebSocketOptions;
 
 public class ConnHelper {
 	
-	private static WebSocketConnection connection = null;
-	private static AppConnHandler handler = null;
+	public static WebSocketConnection connection = null;
+	public static AppConnHandler handler = null;
 	
 	public static WebSocketConnection getConnInstance(Context context) {
 		

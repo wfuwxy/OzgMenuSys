@@ -1,5 +1,10 @@
 package com.ozg.ozgmenusys;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Timer;
@@ -385,7 +390,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 							labPrice.setText(String.format(priceData, (float)item.getDouble("price")));
 							labPrice.setGravity(Gravity.RIGHT);
 														
-							((MenuActivity)AppConnHandler.this.mContext).getSmallImage(item.getInt("id"));
+							((MenuActivity)AppConnHandler.this.mContext).getSmallImage(item.getInt("id"), item.getString("name"), (float)item.getDouble("price"), item.getString("small_img"));
 							
 						}
 												
@@ -513,38 +518,25 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 						if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_BIG_IMAGE)) {
 							//大图
-							Bitmap bitmap = Commons.stringToBitmap(jsonData.getJSONObject("data").getString("img_base64str"));
-							Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);
-						
-							ImageView bigImg = (ImageView)AppConnHandler.this.mMaskView.findViewById(R.id.menu_detail_big_img);
-							bigImg.setImageDrawable(d);
+							String imgContent = jsonData.getJSONObject("data").getString("img_base64str");
+
+							//保存图片本地缓存							
+							JSONObject menuData = jsonData.getJSONObject("data").getJSONObject("menu_data");
+					    	String cacheImgFileName = "cache_" + String.valueOf(menuData.getInt("id")) + "_bigimg.png";
+					    	Commons.imgCacheWrite(this.mContext, cacheImgFileName, imgContent);
+							
+					    	this.showBigImage(imgContent);
 						}
 						else {
 							//小图
 							
-							LinearLayout listRootLayout = (LinearLayout)this.mCurrShowMainView.findViewById(R.id.menu_list_root_layout);
-							for(int i = 0; i < listRootLayout.getChildCount(); i++) {
-								View menuItem = listRootLayout.getChildAt(i);
-								TextView labSmallImg = (TextView)menuItem.findViewById(R.id.menu_item_lab_small_img);
-								
-								JSONObject menuData = jsonData.getJSONObject("data").getJSONObject("menu_data");
-								if(labSmallImg.getText().equals(menuData.getString("small_img"))) {
-									
-									Bitmap bitmap = Commons.stringToBitmap(jsonData.getJSONObject("data").getString("img_base64str"));
-									Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);			
-									Drawable samllImgDrawable = Commons.zoomDrawable(d, Commons.getSamllImgSize(d.getIntrinsicWidth()), Commons.getSamllImgSize(d.getIntrinsicHeight()));
-									ImageView samllImg = (ImageView)menuItem.findViewById(R.id.menu_item_small_img);
-									samllImg.setImageDrawable(samllImgDrawable);
-									
-									MenuItemOnClickListener l = new MenuItemOnClickListener(menuData.getString("name"), (float)menuData.getDouble("price"));
-									l.setMenuId(menuData.getInt("id"));
-									menuItem.setOnClickListener(l);
-									
-									break;
-								}
-								
-							}
+							//保存图片本地缓存
+							JSONObject menuData = jsonData.getJSONObject("data").getJSONObject("menu_data");
+							String imgContent = jsonData.getJSONObject("data").getString("img_base64str");
+							String cacheImgFileName = "cache_" + String.valueOf(menuData.getInt("id")) + "_smallimg.png";
+					    	Commons.imgCacheWrite(this.mContext, cacheImgFileName, imgContent);
 							
+					    	this.showSmallImage(imgContent, menuData.getInt("id"), menuData.getString("name"), (float)menuData.getDouble("price"), menuData.getString("small_img"));							
 						}
 						
 					}
@@ -680,7 +672,40 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 	            AppConnHandler.this.mHandler.sendMessage(message);    
 	        }          
 	    };  
-	    this.mTimer.schedule(this.mTask, 3000);
+	    this.mTimer.schedule(this.mTask, 6000);
+	}
+	
+	//显示大图
+	public void showBigImage(String imgBase64Str) {
+		Bitmap bitmap = Commons.stringToBitmap(imgBase64Str);
+		Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);
+	
+		ImageView bigImg = (ImageView)AppConnHandler.this.mMaskView.findViewById(R.id.menu_detail_big_img);
+		bigImg.setImageDrawable(d);		
+	}
+	
+	//显示小图
+	public void showSmallImage(String imgBase64Str, int dataId, String name, float price, String smallImg) {
+		LinearLayout listRootLayout = (LinearLayout)this.mCurrShowMainView.findViewById(R.id.menu_list_root_layout);
+		for(int i = 0; i < listRootLayout.getChildCount(); i++) {
+			View menuItem = listRootLayout.getChildAt(i);
+			TextView labSmallImg = (TextView)menuItem.findViewById(R.id.menu_item_lab_small_img);
+											
+			if(labSmallImg.getText().equals(smallImg)) {
+																
+				Bitmap bitmap = Commons.stringToBitmap(imgBase64Str);
+				Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);			
+				Drawable samllImgDrawable = Commons.zoomDrawable(d, Commons.getSamllImgSize(d.getIntrinsicWidth()), Commons.getSamllImgSize(d.getIntrinsicHeight()));
+				ImageView samllImg = (ImageView)menuItem.findViewById(R.id.menu_item_small_img);
+				samllImg.setImageDrawable(samllImgDrawable);
+				
+				MenuItemOnClickListener l = new MenuItemOnClickListener(name, price);
+				l.setMenuId(dataId);
+				menuItem.setOnClickListener(l);
+				
+				break;
+			}								
+		}
 	}
 	
 }

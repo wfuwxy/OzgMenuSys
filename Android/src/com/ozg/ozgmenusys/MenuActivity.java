@@ -1,5 +1,7 @@
 package com.ozg.ozgmenusys;
 
+import java.io.File;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -149,12 +151,46 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	public void getBigImage(int dataId) {
-		this.getImage(dataId, AppConfig.SERV_BIG_IMAGE);
+		
+		String cacheImgFileName = "cache_" + String.valueOf(dataId) + "_bigimg.png";
+		File cacheImgFile = new File(this.getFilesDir() + "/" + cacheImgFileName);
+    	if(cacheImgFile.exists()) {
+    		//缓存文件存在
+    		
+    		if(System.currentTimeMillis() - cacheImgFile.lastModified() > AppConfig.IMG_CACHE_TIMEOUT) {
+    			//缓存过期
+    			cacheImgFile.delete();
+    			this.getImage(dataId, AppConfig.SERV_BIG_IMAGE);
+    		}
+    		else {
+    			String imgContent = Commons.imgCacheRead(this, cacheImgFileName);
+    			ConnHelper.handler.showBigImage(imgContent);
+    		}
+    	}
+    	else
+    		this.getImage(dataId, AppConfig.SERV_BIG_IMAGE);
 		
 	}
 	
-	public void getSmallImage(int dataId) {
-		this.getImage(dataId, AppConfig.SERV_SMALL_IMAGE);
+	public void getSmallImage(int dataId, String name, float price, String smallImg) {
+		
+		String cacheImgFileName = "cache_" + String.valueOf(dataId) + "_smallimg.png";
+		File cacheImgFile = new File(this.getFilesDir() + "/" + cacheImgFileName);
+    	if(cacheImgFile.exists()) {
+    		//缓存文件存在
+    		
+    		if(System.currentTimeMillis() - cacheImgFile.lastModified() > AppConfig.IMG_CACHE_TIMEOUT) {
+    			//缓存过期
+    			cacheImgFile.delete();
+    			this.getImage(dataId, AppConfig.SERV_SMALL_IMAGE);
+    		}
+    		else {
+    			String imgContent = Commons.imgCacheRead(this, cacheImgFileName);
+    			ConnHelper.handler.showSmallImage(imgContent, dataId, name, price, smallImg);
+    		}
+    	}
+    	else
+    		this.getImage(dataId, AppConfig.SERV_SMALL_IMAGE);
 		
 	}
 	
