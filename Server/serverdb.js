@@ -84,6 +84,10 @@ exports.getMenuClassList = function(connection) {
 
 //获取一个菜单分类下面的菜单列表
 exports.getMenuList = function(connection, dataId) {
+	dataId = commons.sqlValid(connection, dataId, strings.COMMONS_MSG2);
+	if(!dataId)
+		return;
+
 	var sql = "select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.class_id = " + dataId + " order by m.id desc, m.sort desc";
 	writeDbData(connection, sql);	
 }
@@ -92,7 +96,10 @@ exports.getMenuList = function(connection, dataId) {
 /*exports.getMenuDetail = function(connection, dataId) {	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
-			
+			dataId = commons.sqlValid(connection, dataId, strings.COMMONS_MSG2);
+			if(!dataId)
+				return;
+
 			db.get("select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.id = " + dataId, function(err, row) {
 
 				var outputStr = commons.outputJsonStr(1, "", "", row);			
@@ -114,7 +121,10 @@ function getMenuImage(connection, dataId, isSmall) {
 	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
-			
+			dataId = commons.sqlValid(connection, dataId, strings.COMMONS_MSG2);
+			if(!dataId)
+				return;
+
 			db.get("select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.id = " + dataId, function(err, row2) {
 				var imgStr = null;
 				if(isSmall)
@@ -163,12 +173,20 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
-			
+			menuId = commons.sqlValid(connection, menuId, strings.COMMONS_MSG2);
+			if(!menuId)
+				return;
+
 			db.get("select * from menu where id = " + menuId, function(err, row2) {
 				
 				db.get("select id from `order` where client_id = " + row.id + " and status = 0 order by id desc, add_time desc limit 1", function(err, row3) {
 					
 					var addTime = Date.parse(new Date()) / 1000;
+					
+					quantity = commons.sqlValid(connection, quantity, strings.COMMONS_MSG2);
+					if(!quantity)
+						return;
+
 					db.run("insert into order_detail (add_time, menu_id, price, quantity, menu_name, order_id) values(" + addTime + ", " + row2.id + ", " + row2.price + ", " + quantity + ", '" + row2.name + "', " + row3.id + ")");
 					
 					var updateTime = addTime;
@@ -269,7 +287,11 @@ exports.openClient = function(connection, targetClientIp) {
 		if(row != undefined && row) {
 									
 			if(row.is_admin == 1) {
-												
+				
+				targetClientIp = commons.sqlValid(connection, targetClientIp, strings.COMMONS_MSG2);
+				if(!targetClientIp)
+					return;
+
 				db.get("select * from client where ip = '" + targetClientIp + "'", function(err, row2) {
 					
 					var sql = "update client set status = 1 where ip = '" + targetClientIp + "'";
@@ -320,7 +342,10 @@ exports.closeClient = function(connection, targetClientIp) {
 		if(row != undefined && row) {
 									
 			if(row.is_admin == 1) {
-				
+				targetClientIp = commons.sqlValid(connection, targetClientIp, strings.COMMONS_MSG2);
+				if(!targetClientIp)
+					return;
+
 				db.get("select * from client where ip = '" + targetClientIp + "'", function(err, row2) {
 					var sql = "update client set status = 0 where ip = '" + targetClientIp + "'";
 					db.run(sql);

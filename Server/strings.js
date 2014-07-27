@@ -1,5 +1,6 @@
 
 exports.COMMONS_MSG1 = "命令参数错误";
+exports.COMMONS_MSG2 = "无效传输";
 
 exports.CHECK_MSG1 = "本机器还没有在服务器进行相关设置。";
 exports.CHECK_MSG2 = "{0}未开通，请到服务台开通。";
