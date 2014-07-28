@@ -14,11 +14,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -26,6 +29,8 @@ import android.widget.TextView;
 public class MenuActivity extends BaseActivity {
 		
 	public String mCmd = null;
+	
+	private ImageView mProgressView = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +96,8 @@ public class MenuActivity extends BaseActivity {
 	}
 
 	public void getMenuClassList() {
-
+		this.showProgress();
+		
 		this.mCmd = AppConfig.SERV_MENU_CLASS_LIST;
 				
 		JSONObject sendData = new JSONObject();
@@ -106,6 +112,8 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	public void getMenuList(int dataId) {
+		this.showProgress();
+		
 		this.mCmd = AppConfig.SERV_MENU_LIST;
 		JSONObject sendData = new JSONObject();
 		try {
@@ -121,7 +129,8 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	public void getOrderList() {
-
+		this.showProgress();
+		
 		this.mCmd = AppConfig.SERV_ORDER_LIST;
 		JSONObject sendData = new JSONObject();
 		try {
@@ -160,6 +169,8 @@ public class MenuActivity extends BaseActivity {
     		if(System.currentTimeMillis() - cacheImgFile.lastModified() > AppConfig.IMG_CACHE_TIMEOUT) {
     			//缓存过期
     			cacheImgFile.delete();
+    			
+    			this.showProgress();
     			this.getImage(dataId, AppConfig.SERV_BIG_IMAGE);
     		}
     		else {
@@ -167,9 +178,11 @@ public class MenuActivity extends BaseActivity {
     			ConnHelper.handler.showBigImage(imgContent);
     		}
     	}
-    	else
+    	else {
+    		this.showProgress();
     		this.getImage(dataId, AppConfig.SERV_BIG_IMAGE);
-		
+    	}
+    	
 	}
 	
 	public void getSmallImage(int dataId, String name, float price, String smallImg) {
@@ -195,6 +208,8 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	public void addOrder(int menuId, int quantity) {
+		this.showProgress();
+		
 		this.mCmd = AppConfig.SERV_ADD_ORDER;
 		JSONObject sendData = new JSONObject();
 		try {
@@ -254,6 +269,42 @@ public class MenuActivity extends BaseActivity {
 			classBtn.setClickable(enabled);
 		}
 		
+	}
+	
+	//显示进度条
+	public void showProgress() {
+		this.hideProgress();
+		
+		if(this.mProgressView == null) {
+			RelativeLayout mainRoot = (RelativeLayout)this.findViewById(R.id.menu_root);
+			
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(96, 96);		
+			
+			DisplayMetrics dm = new DisplayMetrics();getWindowManager().getDefaultDisplay().getMetrics(dm);
+		    
+			lp.leftMargin = dm.widthPixels / 2;
+			lp.topMargin = dm.heightPixels / 2;
+			lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
+			lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+			lp.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+			this.mProgressView = new ImageView(this);
+			this.mProgressView.setBackgroundResource(R.drawable.loading);		
+			mainRoot.addView(this.mProgressView, lp);
+			AnimationDrawable anim = (AnimationDrawable)this.mProgressView.getBackground();
+			anim.start();	
+		}
+	}
+	
+	//隐藏（移除）进度条
+	public void hideProgress() {
+		RelativeLayout mainRoot = (RelativeLayout)this.findViewById(R.id.menu_root);
+		if(this.mProgressView != null) {
+			AnimationDrawable anim = (AnimationDrawable)this.mProgressView.getBackground();
+			anim.stop();
+			
+			mainRoot.removeView(this.mProgressView);
+			this.mProgressView = null;
+		}
 	}
 	
 }

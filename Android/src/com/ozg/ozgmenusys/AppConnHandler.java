@@ -159,7 +159,8 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 			l.mMenuId = this.mMenuId;
 			((Button)AppConnHandler.this.mMaskView.findViewById(R.id.menu_detail_btn_addorder)).setOnClickListener(l);
 			
-			rootLayout.addView(AppConnHandler.this.mMaskView, lp);			
+			//固定索引是为了确保显示在进度条的下面
+			rootLayout.addView(AppConnHandler.this.mMaskView, 2, lp);			
 		}
 		
 		public int getMenuId() {
@@ -300,6 +301,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 			if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_CLASS_LIST)) {
 				
 				//菜单分类数据
+				((MenuActivity)this.mContext).hideProgress();
 				
 				try {
 					JSONObject jsonData = new JSONObject(payload);
@@ -345,10 +347,12 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 
 					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
+								
 			}
 			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_LIST)) {
 				
 				//菜单数据
+				((MenuActivity)this.mContext).hideProgress();
 				
 				try {
 					JSONObject jsonData = new JSONObject(payload);
@@ -369,7 +373,9 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						lp.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
 						
 						this.mCurrShowMainView = View.inflate(this.mContext, R.layout.menu_list, null);
-						menuRoot.addView(this.mCurrShowMainView, lp);
+						
+						//固定索引是为了确保显示在进度条的下面
+						menuRoot.addView(this.mCurrShowMainView, 1, lp);
 												
 						JSONArray menuData = jsonData.getJSONArray("data");
 						for(int i = 0; i < menuData.length(); i++) {
@@ -410,6 +416,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ORDER_LIST)) {
 				
 				//订单数据
+				((MenuActivity)this.mContext).hideProgress();
 				
 				try {
 					JSONObject jsonData = new JSONObject(payload);
@@ -431,7 +438,9 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						lp.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);	
 														
 						this.mCurrShowMainView = View.inflate(this.mContext, R.layout.menu_order_list, null);
-						menuRoot.addView(this.mCurrShowMainView, lp);
+						
+						//固定索引是为了确保显示在进度条的下面
+						menuRoot.addView(this.mCurrShowMainView, 1, lp);
 						
 						LinearLayout menuOrderSvLayout = (LinearLayout)this.mCurrShowMainView.findViewById(R.id.menu_order_list_root).findViewById(R.id.menu_order_sv).findViewById(R.id.menu_order_sv_layout);
 						
@@ -518,6 +527,8 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 						if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_BIG_IMAGE)) {
 							//大图
+							((MenuActivity)this.mContext).hideProgress();
+							
 							String imgContent = jsonData.getJSONObject("data").getString("img_base64str");
 
 							//保存图片本地缓存							
@@ -553,7 +564,8 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 			}
 			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ADD_ORDER)) {
 				//下单
-
+				((MenuActivity)this.mContext).hideProgress();
+				
 				try {
 					JSONObject jsonData = new JSONObject(payload);
 					
@@ -645,7 +657,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 				}
 								
 			}
-			
+						
 		}	
 		
 	}
