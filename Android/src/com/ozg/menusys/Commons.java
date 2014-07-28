@@ -1,4 +1,4 @@
-package com.ozg.ozgmenusys;
+package com.ozg.menusys;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

@@ -21,7 +21,9 @@
 	<string name="menu_detail_btn_addorder">下单</string>
 	<string name="menu_detail_addorder_dialog_msg">下单了以后不能将取消！</string>
 	<string name="menu_payment_dialog_msg">确认结账！</string>
-	
+	<string name="menu_no_menuclassdata_msg">暂时没有分类数据</string>
+	<string name="menu_no_menudata_msg">该类别暂时没有菜单数据</string>
+		
 	<string name="menu_commons_dialog_title">Ozg点餐系统 提示</string>
 	<string name="menu_commons_dialog_btn_yes">确定</string>
 	<string name="menu_commons_dialog_btn_no">取消</string>

@@ -1,4 +1,4 @@
-package com.ozg.ozgmenusys;
+package com.ozg.menusys;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,7 +14,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.ozg.ozgmenusys.R.drawable;
+import com.ozg.menusys.R.drawable;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -336,6 +336,10 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 							((MenuActivity)this.mContext).getMenuList(item.getInt("id"));
 							
 						}
+						else {
+							//没有分类数据
+							Commons.alertErrMsg(this.mContext, this.mContext.getString(R.string.menu_no_menuclassdata_msg));
+						}
 						
 					}
 					else {
@@ -399,7 +403,12 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 							((MenuActivity)AppConnHandler.this.mContext).getSmallImage(item.getInt("id"), item.getString("name"), (float)item.getDouble("price"), item.getString("small_img"));
 							
 						}
-												
+						
+						//没有数据的处理
+						if(menuData.length() == 0) {
+							Commons.alertErrMsg(this.mContext, this.mContext.getString(R.string.menu_no_menudata_msg));
+						}
+						
 					}
 					else {
 						//请求出问题了

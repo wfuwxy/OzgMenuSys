@@ -1,4 +1,4 @@
-package com.ozg.ozgmenusys;
+package com.ozg.menusys;
 
 import org.json.JSONException;
 import org.json.JSONObject;

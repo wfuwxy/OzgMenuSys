@@ -1,4 +1,4 @@
-package com.ozg.ozgmenusys;
+package com.ozg.menusys;
 
 public class AppConfig {
 	
