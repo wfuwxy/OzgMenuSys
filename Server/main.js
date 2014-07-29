@@ -7,8 +7,7 @@ var strings = require("./strings");
 var commons = require("./commons");
 var serverdb = require("./serverdb");
 
-var clientList = new Array(); //客户端列表
-serverdb.setClientList(clientList);
+var clientList = serverdb.clientList; //客户端列表
 
 var server = http.createServer(function(request, response) {
     console.log((new Date()) + " Received request for " + request.url);
@@ -39,7 +38,7 @@ wsServer.on("request", function(request) {
     }
 
     var connection = request.accept("echo-protocol", request.origin);
-    console.log((new Date()) + " Connection accepted.");
+    console.log((new Date()) + " " + connection.remoteAddress + " Connection accepted.");
 	
 	//添加客户端列表
 	var existList = false;
@@ -121,6 +120,11 @@ wsServer.on("request", function(request) {
 			else if(inputObj.cmd == cmd.SERV_ISEND_CLIENT) {
 				//检测订单是否已归档
 				serverdb.isEndClient(connection);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_ONLINE_LIST) {
+				//在线列表
+				serverdb.onlineList(connection);				
 
 			}
 			else {

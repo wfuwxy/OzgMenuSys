@@ -6,6 +6,7 @@ exports.CHECK_MSG1 = "本机器还没有在服务器进行相关设置。";
 exports.CHECK_MSG2 = "{0}未开通，请到服务台开通。";
 exports.CHECK_MSG3 = "{0}已开通。";
 exports.CHECK_MSG4 = "{0}不是服务台IP。";
+exports.CHECK_MSG5 = "{0}是服务台。";
 
 exports.NOTICE_MSG1 = "{0}已开通。";
 exports.NOTICE_MSG2 = "{0}已归档。";

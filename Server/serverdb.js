@@ -11,7 +11,8 @@ var db = new sqlite3.Database(cfg.DB_PATH);
 var chkClientSql = "select * from client where ip = '{0}' and status = 1";
 var chkClientSql2 = "select * from client where ip = '{0}'"; //检测订单是否归档的时候用到
 
-var clientList = null;
+var clientList = new Array()
+exports.clientList = clientList; //客户端列表，里面的元素是connection对象
 
 //公用方法不用exports
 function writeErrorIp(connection) {
@@ -51,20 +52,32 @@ exports.checkClient = function(connection) {
 			
 			//console.log("已接收ip " + row.ip + "发来的数据:" + data);
 			
-			if(row.status == 0) {
-				//未开通
-				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG2, row.name));
-				connection.sendUTF(outputStr);
-			}
-			else if(row.status == 1) {
-				//已开通的逻辑
-				
+			if(row.is_admin == 1) {
+				//服务台
 				var data = {
 					"client": row
 				};
-				var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMAIN, data);
+				var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG5, row.ip), cmd.CLIENT_WANT_TOMAIN, data);
 				connection.sendUTF(outputStr);
 			}
+			else {
+				//一般客户端
+
+				if(row.status == 0) {
+					//未开通
+					var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG2, row.name));
+					connection.sendUTF(outputStr);
+				}
+				else if(row.status == 1) {
+					//已开通的逻辑
+					
+					var data = {
+						"client": row
+					};
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMAIN, data);
+					connection.sendUTF(outputStr);
+				}
+			}			
 
 		}
 		else {
@@ -74,13 +87,13 @@ exports.checkClient = function(connection) {
 		}
 
 	});	
-}
+};
 
 //获取菜单分类列表
 exports.getMenuClassList = function(connection) {
 	var sql = "select * from menu_class order by id desc, sort desc";
 	writeDbData(connection, sql);
-}
+};
 
 //获取一个菜单分类下面的菜单列表
 exports.getMenuList = function(connection, dataId) {
@@ -90,7 +103,7 @@ exports.getMenuList = function(connection, dataId) {
 
 	var sql = "select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.class_id = " + dataId + " order by m.id desc, m.sort desc";
 	writeDbData(connection, sql);	
-}
+};
 
 //获取一个菜单的详细数据
 /*exports.getMenuDetail = function(connection, dataId) {	
@@ -114,7 +127,7 @@ exports.getMenuList = function(connection, dataId) {
 
 	});
 
-}*/
+}; */
 
 //获取一个图片（公用方法不用exports）
 function getMenuImage(connection, dataId, isSmall) {
@@ -149,21 +162,21 @@ function getMenuImage(connection, dataId, isSmall) {
 
 	});
 
-}
+};
 
 //获取一个小图
 exports.getMenuSmallImage = function(connection, dataId) {
 	
 	getMenuImage(connection, dataId, true);
 
-}
+};
 
 //获取一个大图
 exports.getMenuBigImage = function(connection, dataId) {
 	
 	getMenuImage(connection, dataId, false);
 
-}
+};
 
 //点菜
 exports.addOrderDetail = function(connection, menuId, quantity) {
@@ -205,14 +218,14 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 
 	});
 
-}
+};
 
 //获取当前客户端的订单列表
 exports.getOrderList = function(connection) {
 	
 	var sql = "select od.*, o.update_time as o_update_time from order_detail as od left join `order` as o on od.order_id = o.id left join client as c on o.client_id = c.id where c.ip = '" + connection.remoteAddress + "' and o.status = 0";
 	writeDbData(connection, sql);
-}
+};
 
 //当前客户端结帐
 exports.orderPayment = function(connection) {
@@ -251,7 +264,7 @@ exports.orderPayment = function(connection) {
 
 	});
 
-}
+};
 
 exports.isEndClient = function(connection) {
 	//检测订单是否已归档
@@ -279,7 +292,7 @@ exports.isEndClient = function(connection) {
 		}
 
 	});
-}
+};
 
 exports.openClient = function(connection, targetClientIp) {
 	//服务台开通一个客户端
@@ -334,7 +347,7 @@ exports.openClient = function(connection, targetClientIp) {
 		}
 
 	});
-}
+};
 
 exports.closeClient = function(connection, targetClientIp) {
 	//服务台归档一个客户端
@@ -381,8 +394,69 @@ exports.closeClient = function(connection, targetClientIp) {
 		}
 
 	});
+};
+
+//在线列表用到
+var statClientData = null;
+function statClient(connection, rows, i) {
+	
+	if(statClientData == null)
+		statClientData = new Array();
+
+	db.get("select o.status as o_status, sum(od.price) as total_price from `order` as o left join order_detail as od on o.id = od.order_id where o.client_id = " + rows[i].id + " and o.status < 2", function(err, row) {
+		
+		var statClientDataItem = {};
+		statClientDataItem.o_status = row.o_status;
+		statClientDataItem.total_price = row.total_price;
+		statClientDataItem.ip = rows[i].ip;
+		statClientDataItem.name = rows[i].name;
+		statClientDataItem.status = rows[i].status;
+		statClientDataItem.is_admin = rows[i].is_admin;
+		statClientData.push(statClientDataItem);
+
+		i++;
+		
+		if(i < rows.length) {
+			statClient(connection, rows, i);
+		}
+		else {
+			var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_ONLINE_LIST, statClientData);
+			connection.sendUTF(outputStr);
+
+			statClientData = null;
+		}
+		
+	});
 }
 
-exports.setClientList = function(pClientList) {
-	clientList = pClientList;
+exports.onlineList = function(connection) {
+	//在线列表
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				var ipList = new Array();
+				for(var i = 0; i < clientList.length; i++)
+					ipList.push("'" + clientList[i].remoteAddress + "'");
+
+				var sql = "select * from client where ip in(" + ipList.toString() + ") order by id desc";
+				db.all(sql, function(err, rows) {
+					if(rows.length > 0)
+						statClient(connection, rows, 0);
+					
+				});
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
 };
