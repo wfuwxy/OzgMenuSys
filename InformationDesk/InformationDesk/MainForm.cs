@@ -17,6 +17,8 @@ namespace InformationDesk
         private WebSocket Connection;
 
         private List<int> InformationDeskIndices; //服务台的索引
+        private Dictionary<int, string> ClientNameList; //一般客户端的名称列表
+        private Dictionary<int, int> ClientStatusList; //一般客户端的状态列表
         private int ListSelectedIndex = -1; //保存选定项的索引
 
         public MainForm()
@@ -113,6 +115,8 @@ namespace InformationDesk
                     //显示在线列表
 
                     this.InformationDeskIndices = new List<int>();
+                    this.ClientStatusList = new Dictionary<int, int>();
+                    this.ClientNameList = new Dictionary<int, string>();
                     this.OnlineList.Items.Clear();
 
                     JsonArrayCollection data = (JsonArrayCollection)jsonData["data"];
@@ -126,7 +130,7 @@ namespace InformationDesk
                             ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, "服务台", "运行中" });
                             this.OnlineList.Items.Add(item);
 
-                            InformationDeskIndices.Add(i);
+                            this.InformationDeskIndices.Add(i);
                         }
                         else
                         {
@@ -135,14 +139,22 @@ namespace InformationDesk
 
                             if (itemData["o_status"].GetValue() != null)
                             {
+                                float totalPrice = 0.0f;
+                                if (itemData["total_price"].GetValue() != null)
+                                    totalPrice = (float)((JsonNumericValue)itemData["total_price"]).Value;
+
                                 if (((JsonNumericValue)itemData["o_status"]).Value == 0)
-                                    status = "已消费" + ((JsonNumericValue)itemData["total_price"]).Value.ToString("f1") + "元";
+                                    status = "已消费" + totalPrice.ToString("f1") + "元";
                                 else if (((JsonNumericValue)itemData["o_status"]).Value == 1)
-                                    status = "结账中，金额为" + ((JsonNumericValue)itemData["total_price"]).Value.ToString("f1") + "元";                            
+                                    status = "结账中，金额为" + totalPrice.ToString("f1") + "元";
+
+                                this.ClientStatusList.Add(i, (int)((JsonNumericValue)itemData["o_status"]).Value);
+                                this.ClientNameList.Add(i, ((JsonStringValue)itemData["name"]).Value);
                             }
-                            
+                                                        
                             ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, "一般", status });
                             this.OnlineList.Items.Add(item);
+                            
                         }                        
                         
                     }
@@ -166,12 +178,33 @@ namespace InformationDesk
         {
             if (this.OnlineList.SelectedItems.Count == 1)
             { 
-                //确保选中一个
+                //确保只选中一个
                 if (!this.InformationDeskIndices.Contains(this.OnlineList.SelectedItems[0].Index))
                 {
                     this.ListSelectedIndex = this.OnlineList.SelectedItems[0].Index;
-                    MessageBox.Show(this.OnlineList.SelectedItems[0].SubItems[1].Text);
+                    //MessageBox.Show(this.OnlineList.SelectedItems[0].SubItems[1].Text);
 
+                    //订单状态：0为消费中，1为结账中，2为已归档
+
+                    if (this.ClientStatusList[this.ListSelectedIndex] == 0)
+                    { 
+                        //弹出开通确认框
+                        DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg1, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                        if (res == DialogResult.OK)
+                        { 
+                            
+                        }
+                    }
+                    else if (this.ClientStatusList[this.ListSelectedIndex] == 1)
+                    {
+                        //已结账中的时候，弹出归档确认框
+                        DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg2, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                        if (res == DialogResult.OK)
+                        {
+
+                        }
+                    }
+                    
                 }
             }
             

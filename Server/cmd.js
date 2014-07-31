@@ -1,6 +1,7 @@
 
 //服务端发送到客户端的命令
 exports.CLIENT_WANT_TOMAIN = "CLIENT_WANT_TOMAIN";
+exports.CLIENT_WANT_TOMENU = "CLIENT_WANT_TOMENU";
 exports.CLIENT_WANT_ONLINE_LIST = "CLIENT_WANT_ONLINE_LIST"; //服务台用
 
 //客户端发送到服务端的命令

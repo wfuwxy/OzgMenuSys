@@ -8,7 +8,13 @@ namespace InformationDesk
 {
     public class Strings
     {
+        public static string CommonsDialogTitle = "Ozg点餐系统";
+        public static string CommonsDialogYes = "确定";
+        public static string CommonsDialogNo = "取消";
+
         public static string MainFormTitle = "Ozg点餐系统-服务台";
+        public static string MainFormDialogOpenClientMsg1 = "确认开通[{0}]！";
+        public static string MainFormDialogOpenClientMsg2 = "确认归档[{0}]的订单！";
 
         public static string MenuClassFormTitle = "菜单分类";
         public static string MenuClassFormBtnAdd = "新增";

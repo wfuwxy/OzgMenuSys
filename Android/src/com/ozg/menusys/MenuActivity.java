@@ -243,21 +243,6 @@ public class MenuActivity extends BaseActivity {
 		
 	}
 	
-	public void isEndClient() {
-		this.mCmd = AppConfig.SERV_ISEND_CLIENT;
-		JSONObject sendData = new JSONObject();
-		try {
-			
-			sendData.put("cmd", this.mCmd);			
-			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
-			
-		} catch (JSONException e) {
-
-			e.printStackTrace();
-		}
-		
-	}
-	
 	public void enabledView(Boolean enabled) {
 		((Button)this.findViewById(R.id.btn_order)).setClickable(enabled);
 		((Button)this.findViewById(R.id.btn_payment)).setClickable(enabled);

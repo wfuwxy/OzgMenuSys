@@ -56,12 +56,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 	private View mCurrShowMainView = null;
 	
 	private View mMaskView = null;
-	
-	//结账后，自动检测服务器是否已经归档了
-	private Timer mTimer;  
-	private Handler mHandler;  
-    private TimerTask mTask;  
-	
+		
 	 //获取菜单分类列表数据后显示时用到
 	private class MenuClassItemOnClickListener implements OnClickListener {
 		
@@ -259,7 +254,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 	    	try {
 				JSONObject data = new JSONObject(payload);
 
-				if(data.has("cmd") && data.getString("cmd").equals(AppConfig.CLIENT_WANT_TOMAIN)) {
+				if(data.has("cmd") && data.getString("cmd").equals(AppConfig.CLIENT_WANT_TOMENU)) {
 					//被动接受了服务器的回应命令，跳到菜单界面
 					
 					SharedPreferences sp = ((MainActivity)this.mContext).getSharedPreferences(AppConfig.APP_DATA, Context.MODE_PRIVATE);
@@ -297,14 +292,15 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 		else if((Activity)this.mContext instanceof MenuActivity) {
 			
 			//菜单界面
+			JSONObject jsonData;
 			
-			if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_CLASS_LIST)) {
-				
-				//菜单分类数据
-				((MenuActivity)this.mContext).hideProgress();
-				
-				try {
-					JSONObject jsonData = new JSONObject(payload);
+			try {
+				jsonData = new JSONObject(payload);
+												
+				if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_CLASS_LIST)) {
+					
+					//菜单分类数据
+					((MenuActivity)this.mContext).hideProgress();
 					
 					LinearLayout menuClassSvLayout = (LinearLayout)((MenuActivity)this.mContext).findViewById(R.id.menu_class_sv_layout);
 					
@@ -346,20 +342,13 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						//请求出问题了
 						
 					}
-					
-				} catch (JSONException e) {
-
-					ConnHelper.getConnInstance(this.mContext).disconnect();
+									
 				}
-								
-			}
-			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_LIST)) {
-				
-				//菜单数据
-				((MenuActivity)this.mContext).hideProgress();
-				
-				try {
-					JSONObject jsonData = new JSONObject(payload);
+				else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_MENU_LIST)) {
+					
+					//菜单数据
+					((MenuActivity)this.mContext).hideProgress();
+					
 					if(jsonData.getInt("ok") == 1) {
 						
 						RelativeLayout menuRoot = (RelativeLayout)((MenuActivity)this.mContext).findViewById(R.id.menu_root);
@@ -415,23 +404,15 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 					}
 					
-				} catch (JSONException e) {
-
-					ConnHelper.getConnInstance(this.mContext).disconnect();
+					((MenuActivity)this.mContext).enabledView(true);
 				}
-				
-				((MenuActivity)this.mContext).enabledView(true);
-			}
-			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ORDER_LIST)) {
-				
-				//订单数据
-				((MenuActivity)this.mContext).hideProgress();
-				
-				try {
-					JSONObject jsonData = new JSONObject(payload);
+				else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ORDER_LIST)) {
+					
+					//订单数据
+					((MenuActivity)this.mContext).hideProgress();
 					
 					if(jsonData.getInt("ok") == 1) {
-					
+						
 						RelativeLayout menuRoot = (RelativeLayout)((MenuActivity)this.mContext).findViewById(R.id.menu_root);
 						
 						if(this.mCurrShowMainView != null) {
@@ -519,19 +500,12 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 					}
 					
-				} catch (JSONException e) {
-					
-					ConnHelper.getConnInstance(this.mContext).disconnect();
+					((MenuActivity)this.mContext).enabledView(true);
 				}
-				
-				((MenuActivity)this.mContext).enabledView(true);
-			}
-			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_BIG_IMAGE) || ((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_SMALL_IMAGE)) {				
-				
-				//图片相关
-				
-				try {
-					JSONObject jsonData = new JSONObject(payload);
+				else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_BIG_IMAGE) || ((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_SMALL_IMAGE)) {				
+					
+					//图片相关
+					
 					if(jsonData.getInt("ok") == 1) {						
 						
 						if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_BIG_IMAGE)) {
@@ -564,19 +538,11 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						//请求出问题了
 						
 					}
-										
-				} catch (JSONException e) {
-
-					ConnHelper.getConnInstance(this.mContext).disconnect();
+									
 				}
-								
-			}
-			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ADD_ORDER)) {
-				//下单
-				((MenuActivity)this.mContext).hideProgress();
-				
-				try {
-					JSONObject jsonData = new JSONObject(payload);
+				else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ADD_ORDER)) {
+					//下单
+					((MenuActivity)this.mContext).hideProgress();
 					
 					RelativeLayout rootLayout = (RelativeLayout)((MenuActivity)AppConnHandler.this.mContext).findViewById(R.id.menu_root);
 					
@@ -586,116 +552,72 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 					}
 					
 					Commons.alertErrMsg(this.mContext, jsonData.getString("message"));
+				}
+				else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_PAYMENT)) {
+					//结账
 					
-				} catch (JSONException e) {
-					
-					ConnHelper.getConnInstance(this.mContext).disconnect();
-				}				
-			}
-			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_PAYMENT)) {
-				//结账
-
-				try {
-					JSONObject jsonData = new JSONObject(payload);
 					if(jsonData.getInt("ok") == 1) {
-												
-						RelativeLayout rootLayout = (RelativeLayout)((MenuActivity)AppConnHandler.this.mContext).findViewById(R.id.menu_root);
-						
-						DisplayMetrics dm = new DisplayMetrics();
-						((MenuActivity)AppConnHandler.this.mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
-						
-						RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dm.widthPixels, dm.heightPixels);	
-						
-						if(this.mMaskView != null) {
-							rootLayout.removeView(this.mMaskView);
-							this.mMaskView = null;
-						}
-						
-						this.mMaskView = View.inflate(this.mContext, R.layout.menu_payment_result, null);
-						
-						TextView paymentResultLabMsg = (TextView)this.mMaskView.findViewById(R.id.menu_payment_result_lab_msg);
-						paymentResultLabMsg.setText(jsonData.getString("message"));
-						paymentResultLabMsg.setGravity(Gravity.CENTER);
-						
-						//挡住层后面的事件触发
-						this.mMaskView.setOnTouchListener(new OnTouchListener() { 
+						if(jsonData.has("cmd") && jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_TOMAIN)) {
+							//服务器是否已经归档了，返回第一个界面
 
-							@Override
-							public boolean onTouch(View v, MotionEvent event) {
-								return true;
+							SharedPreferences sp = this.mContext.getSharedPreferences(AppConfig.APP_DATA, Context.MODE_PRIVATE);
+							if(sp.contains(AppConfig.CLIENT_DATA)) {
+								Editor editor = sp.edit();
+								editor.remove(AppConfig.CLIENT_DATA);
+								editor.commit();
 							}
-						});
-						
-						rootLayout.addView(AppConnHandler.this.mMaskView, lp);	
-						
-						//自动检测服务器是否已经归档了
-						this.closeClientEnd();
-					    
+
+							//回到第一个界面
+							((MenuActivity)this.mContext).finish();						
+						}	
+						else {
+							//进入结账界面
+
+							RelativeLayout rootLayout = (RelativeLayout)((MenuActivity)AppConnHandler.this.mContext).findViewById(R.id.menu_root);
+							
+							DisplayMetrics dm = new DisplayMetrics();
+							((MenuActivity)AppConnHandler.this.mContext).getWindowManager().getDefaultDisplay().getMetrics(dm);
+							
+							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(dm.widthPixels, dm.heightPixels);	
+							
+							if(this.mMaskView != null) {
+								rootLayout.removeView(this.mMaskView);
+								this.mMaskView = null;
+							}
+							
+							this.mMaskView = View.inflate(this.mContext, R.layout.menu_payment_result, null);
+							
+							TextView paymentResultLabMsg = (TextView)this.mMaskView.findViewById(R.id.menu_payment_result_lab_msg);
+							paymentResultLabMsg.setText(jsonData.getString("message"));
+							paymentResultLabMsg.setGravity(Gravity.CENTER);
+							
+							//挡住层后面的事件触发
+							this.mMaskView.setOnTouchListener(new OnTouchListener() { 
+
+								@Override
+								public boolean onTouch(View v, MotionEvent event) {
+									return true;
+								}
+							});
+							
+							rootLayout.addView(AppConnHandler.this.mMaskView, lp);	
+						}
 					}
 					else {
 						//结账失败
 						Commons.alertErrMsg(this.mContext, jsonData.getString("message"));
 					}
-					
-				} catch (JSONException e) {
-					
-					ConnHelper.getConnInstance(this.mContext).disconnect();
 				}
+				
+			} catch (JSONException e) {
+
+				e.printStackTrace();
 			}
-			else if(((MenuActivity)this.mContext).mCmd.equals(AppConfig.SERV_ISEND_CLIENT)) {
-				//自动检测服务器是否已经归档了
-				try {
-					JSONObject jsonData = new JSONObject(payload);
-					if(jsonData.getInt("ok") == 1) {
-						SharedPreferences sp = this.mContext.getSharedPreferences(AppConfig.APP_DATA, Context.MODE_PRIVATE);
-						if(sp.contains(AppConfig.CLIENT_DATA)) {
-							Editor editor = sp.edit();
-							editor.remove(AppConfig.CLIENT_DATA);
-							editor.commit();
-						}
-						
-						//回到第一个界面
-						((MenuActivity)this.mContext).finish();
-					}
-					else {
-						this.closeClientEnd();
-					}
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-								
-			}
-						
+												
 		}	
 		
 	}
-	
-	//自动检测服务器是否已经归档了
-	private void closeClientEnd() {
-		this.mTimer = new Timer();  
-		this.mHandler = new Handler(){  							  
-	        public void handleMessage(Message msg) {  
-	            switch (msg.what) {      
-		            case 1:      
-		            {
-		            	((MenuActivity)AppConnHandler.this.mContext).isEndClient();
-		            }
-	                break;      
-	            }      
-	            super.handleMessage(msg);  
-	        }  					          
-	    };  
-	    this.mTask = new TimerTask() {    
-	        public void run() {  
-	            Message message = new Message();      
-	            message.what = 1;      
-	            AppConnHandler.this.mHandler.sendMessage(message);    
-	        }          
-	    };  
-	    this.mTimer.schedule(this.mTask, 6000);
-	}
-	
+		
 	//显示大图
 	public void showBigImage(String imgBase64Str) {
 		Bitmap bitmap = Commons.stringToBitmap(imgBase64Str);

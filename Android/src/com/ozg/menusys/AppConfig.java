@@ -19,8 +19,8 @@ public class AppConfig {
 	public static String SERV_SMALL_IMAGE = "SERV_SMALL_IMAGE";
 	public static String SERV_ADD_ORDER = "SERV_ADD_ORDER";
 	public static String SERV_PAYMENT = "SERV_PAYMENT";
-	public static String SERV_ISEND_CLIENT = "SERV_ISEND_CLIENT";
 	
 	public static String CLIENT_WANT_TOMAIN = "CLIENT_WANT_TOMAIN";
-		
+	public static String CLIENT_WANT_TOMENU = "CLIENT_WANT_TOMENU";
+	
 }

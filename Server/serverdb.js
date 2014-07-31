@@ -74,7 +74,7 @@ exports.checkClient = function(connection) {
 					var data = {
 						"client": row
 					};
-					var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMAIN, data);
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMENU, data);
 					connection.sendUTF(outputStr);
 				}
 			}			
@@ -319,7 +319,7 @@ exports.openClient = function(connection, targetClientIp) {
 					var data = {
 						"client": row2
 					};
-					var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG1, row2.name), cmd.CLIENT_WANT_TOMAIN, data);
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG1, row2.name), cmd.CLIENT_WANT_TOMENU, data);
 					for(var i = 0; i < clientList.length; i++) {
 						if(targetClientIp == clientList[i].remoteAddress) {
 							//console.log(outputStr);
@@ -367,13 +367,13 @@ exports.closeClient = function(connection, targetClientIp) {
 					sql = "update `order` set status = 2, update_time = " + parseInt(updateTime) + " where status = 1 and client_id = " + row2.id;
 					db.run(sql);
 
-					/*var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG2, row2.name));
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG2, row2.name), cmd.CLIENT_WANT_TOMAIN);
 					for(var i = 0; i < clientList.length; i++) {
 						if(targetClientIp == clientList[i].remoteAddress) {
 							clientList[i].sendUTF(outputStr);
 							break;
 						}
-					}*/
+					}
 
 					//返回服务台的信息
 					var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG2, row2.name));
