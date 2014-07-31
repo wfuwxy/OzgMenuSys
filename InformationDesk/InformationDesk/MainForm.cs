@@ -16,6 +16,9 @@ namespace InformationDesk
     {
         private WebSocket Connection;
 
+        private List<int> InformationDeskIndices; //服务台的索引
+        private int ListSelectedIndex = -1; //保存选定项的索引
+
         public MainForm()
         {
             InitializeComponent();
@@ -108,6 +111,10 @@ namespace InformationDesk
                 else if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_ONLINE_LIST))
                 { 
                     //显示在线列表
+
+                    this.InformationDeskIndices = new List<int>();
+                    this.OnlineList.Items.Clear();
+
                     JsonArrayCollection data = (JsonArrayCollection)jsonData["data"];
                     for (int i = 0; i < data.Count; i++)
                     {
@@ -118,6 +125,8 @@ namespace InformationDesk
                             //服务台
                             ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, "服务台", "运行中" });
                             this.OnlineList.Items.Add(item);
+
+                            InformationDeskIndices.Add(i);
                         }
                         else
                         {
@@ -137,7 +146,10 @@ namespace InformationDesk
                         }                        
                         
                     }
-                    
+
+                    if (this.ListSelectedIndex > -1)
+                        this.OnlineList.Items[this.ListSelectedIndex].Selected = true;
+
                 }
             }
             else
@@ -148,6 +160,21 @@ namespace InformationDesk
         public void WebSocket_Error(object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
         {
             MessageBox.Show(e.Exception.Message);
+        }
+
+        private void OnlineList_Click(object sender, EventArgs e)
+        {
+            if (this.OnlineList.SelectedItems.Count == 1)
+            { 
+                //确保选中一个
+                if (!this.InformationDeskIndices.Contains(this.OnlineList.SelectedItems[0].Index))
+                {
+                    this.ListSelectedIndex = this.OnlineList.SelectedItems[0].Index;
+                    MessageBox.Show(this.OnlineList.SelectedItems[0].SubItems[1].Text);
+
+                }
+            }
+            
         }
 
     }

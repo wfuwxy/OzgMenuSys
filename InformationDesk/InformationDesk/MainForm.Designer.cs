@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.FileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ExitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -41,6 +42,7 @@
             this.HelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OnlineList = new System.Windows.Forms.ListView();
+            this.ClientItemMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -151,6 +153,12 @@
             this.OnlineList.TabIndex = 1;
             this.OnlineList.UseCompatibleStateImageBehavior = false;
             this.OnlineList.View = System.Windows.Forms.View.Details;
+            this.OnlineList.Click += new System.EventHandler(this.OnlineList_Click);
+            // 
+            // ClientItemMenuStrip
+            // 
+            this.ClientItemMenuStrip.Name = "ClientItemMenuStrip";
+            this.ClientItemMenuStrip.Size = new System.Drawing.Size(61, 4);
             // 
             // MainForm
             // 
@@ -188,5 +196,7 @@
         private System.Windows.Forms.ToolStripMenuItem OrderReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AboutToolStripMenuItem;
         private System.Windows.Forms.ListView OnlineList;
+        private System.Windows.Forms.ContextMenuStrip ClientItemMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }
