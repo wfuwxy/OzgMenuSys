@@ -22,6 +22,8 @@ namespace InformationDesk
         private Dictionary<int, int> ClientStatusList; //一般客户端的状态列表
         private int ListSelectedIndex = -1; //保存选定项的索引
 
+        private Form SubForm = null;
+
         public MainForm()
         {
             InitializeComponent();
@@ -39,10 +41,10 @@ namespace InformationDesk
             this.OnlineList.SmallImageList = imageList;
 
             this.OnlineList.Columns.Add("", 0);
-            this.OnlineList.Columns.Add("名称", 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.OnlineList.Columns.Add("IP", 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;            
-            this.OnlineList.Columns.Add("类别", 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.OnlineList.Columns.Add("状态", 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormListTitle1, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormListTitle2, 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormListTitle3, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormListTitle4, 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 
         }
 
@@ -53,37 +55,37 @@ namespace InformationDesk
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutForm aboutForm = new AboutForm();
-            aboutForm.ShowDialog();
-
+            this.SubForm = new AboutForm();
+            this.SubForm.ShowDialog();
+            this.SubForm = null;
         }
 
         private void MenuClassToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MenuClassForm menuClassForm = new MenuClassForm();
-            menuClassForm.ShowDialog();
-
+            this.SubForm = new MenuClassForm(this.Connection);
+            this.SubForm.ShowDialog();
+            this.SubForm = null;
         }
 
         private void MenuDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MenuForm menuForm = new MenuForm();
-            menuForm.ShowDialog();
-
+            this.SubForm = new MenuForm();
+            this.SubForm.ShowDialog();
+            this.SubForm = null;
         }
 
         private void ClientListToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ClientForm clientForm = new ClientForm();
-            clientForm.ShowDialog();
-
+            this.SubForm = new ClientForm(this.Connection);
+            this.SubForm.ShowDialog();
+            this.SubForm = null;
         }
 
         private void OrderReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OrderReportForm orderReportForm = new OrderReportForm();
-            orderReportForm.ShowDialog();
-
+            this.SubForm = new OrderDayReportForm(this.Connection);
+            this.SubForm.ShowDialog();
+            this.SubForm = null;
         }
 
         public void WebSocket_Opened(object sender, EventArgs e)
@@ -104,6 +106,17 @@ namespace InformationDesk
             JsonObjectCollection jsonData = (JsonObjectCollection)parser.Parse(e.Message);
             if (((JsonNumericValue)jsonData["ok"]).Value == 1)
             {
+                //子窗口相关
+                if (this.SubForm != null)
+                {
+                    if (this.SubForm is OrderDayReportForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_REPORT_DAY))                    
+                        ((OrderDayReportForm)this.SubForm).ShowData(e.Message);
+                    else if (this.SubForm is ClientForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_CLIENT_LIST))
+                        ((ClientForm)this.SubForm).ShowData(e.Message);
+                    else if (this.SubForm is MenuClassForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_MENU_CLASS))
+                        ((MenuClassForm)this.SubForm).ShowData(e.Message);
+                }
+
                 if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_TOMAIN) || ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_GET_ONLINE_LIST))
                 {
                     //发送获取在线列表的请求
@@ -129,7 +142,7 @@ namespace InformationDesk
                         if (((JsonNumericValue)itemData["is_admin"]).Value == 1)
                         {
                             //服务台
-                            ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, "服务台", "运行中" });
+                            ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, Strings.MainFormInformationDeskName, Strings.MainFormInformationDeskStatus });
                             this.OnlineList.Items.Add(item);
 
                             this.InformationDeskIndices.Add(i);
@@ -137,7 +150,7 @@ namespace InformationDesk
                         else
                         {
                             //一般
-                            string status = "正在空闲";
+                            string status = Strings.MainFormClientStatus;
 
                             if (itemData["o_status"].GetValue() != null)
                             {
@@ -146,9 +159,9 @@ namespace InformationDesk
                                     totalPrice = (float)((JsonNumericValue)itemData["total_price"]).Value;
 
                                 if (((JsonNumericValue)itemData["o_status"]).Value == 0)
-                                    status = "已消费" + totalPrice.ToString("f1") + "元";
+                                    status = string.Format(Strings.MainFormClientStatus0, totalPrice.ToString("f1"));
                                 else if (((JsonNumericValue)itemData["o_status"]).Value == 1)
-                                    status = "结账中，金额为" + totalPrice.ToString("f1") + "元";
+                                    status = string.Format(Strings.MainFormClientStatus1, totalPrice.ToString("f1"));
 
                                 this.ClientOrderStatusList.Add(i, (int)((JsonNumericValue)itemData["o_status"]).Value);                                
                             }
@@ -156,7 +169,7 @@ namespace InformationDesk
                             this.ClientNameList.Add(i, ((JsonStringValue)itemData["name"]).Value);
                             this.ClientStatusList.Add(i, (int)((JsonNumericValue)itemData["status"]).Value);
 
-                            ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, "一般", status });
+                            ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["name"]).Value, ((JsonStringValue)itemData["ip"]).Value, Strings.MainFormClientClassName, status });
                             this.OnlineList.Items.Add(item);
                             
                         }                        
@@ -178,48 +191,51 @@ namespace InformationDesk
             MessageBox.Show(e.Exception.Message);
         }
 
-        private void OnlineList_Click(object sender, EventArgs e)
+        private void OnlineList_MouseClick(object sender, MouseEventArgs e)
         {
-            if (this.OnlineList.SelectedItems.Count == 1)
-            { 
-                //确保只选中一个
-                if (!this.InformationDeskIndices.Contains(this.OnlineList.SelectedItems[0].Index))
+            if (e.Button == MouseButtons.Left)
+            {
+                if (this.OnlineList.SelectedItems.Count == 1)
                 {
-                    this.ListSelectedIndex = this.OnlineList.SelectedItems[0].Index;
+                    //确保只选中一个
+                    if (!this.InformationDeskIndices.Contains(this.OnlineList.SelectedItems[0].Index))
+                    {
+                        this.ListSelectedIndex = this.OnlineList.SelectedItems[0].Index;
 
-                    //客户端状态：0为空闲中，1为开通中
-                    if (this.ClientStatusList[this.ListSelectedIndex] == 0)
-                    {
-                        //弹出开通确认框
-                        DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg1, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
-                        if (res == DialogResult.OK)
+                        //客户端状态：0为空闲中，1为开通中
+                        if (this.ClientStatusList[this.ListSelectedIndex] == 0)
                         {
-                            JsonObjectCollection jsonData = new JsonObjectCollection();
-                            jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_OPEN_CLIENT));
-                            jsonData.Add(new JsonStringValue("data", this.OnlineList.SelectedItems[0].SubItems[2].Text));
-                            this.Connection.Send(jsonData.ToString());
-                        }
-                    }
-                    else
-                    {
-                        //订单状态：0为消费中，1为结账中，2为已归档
-                        if (this.ClientOrderStatusList[this.ListSelectedIndex] == 1)
-                        {
-                            //已结账中的时候，弹出归档确认框
-                            DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg2, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                            //弹出开通确认框
+                            DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg1, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
                             if (res == DialogResult.OK)
                             {
                                 JsonObjectCollection jsonData = new JsonObjectCollection();
-                                jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CLOSE_CLIENT));
+                                jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_OPEN_CLIENT));
                                 jsonData.Add(new JsonStringValue("data", this.OnlineList.SelectedItems[0].SubItems[2].Text));
                                 this.Connection.Send(jsonData.ToString());
                             }
                         }
+                        else
+                        {
+                            //订单状态：0为消费中，1为结账中，2为已归档
+                            if (this.ClientOrderStatusList[this.ListSelectedIndex] == 1)
+                            {
+                                //已结账中的时候，弹出归档确认框
+                                DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg2, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                                if (res == DialogResult.OK)
+                                {
+                                    JsonObjectCollection jsonData = new JsonObjectCollection();
+                                    jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CLOSE_CLIENT));
+                                    jsonData.Add(new JsonStringValue("data", this.OnlineList.SelectedItems[0].SubItems[2].Text));
+                                    this.Connection.Send(jsonData.ToString());
+                                }
+                            }
+                        }
+
                     }
-                                        
                 }
             }
-            
+                        
         }
 
     }

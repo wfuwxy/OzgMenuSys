@@ -127,6 +127,36 @@ wsServer.on("request", function(request) {
 				serverdb.onlineList(connection);				
 
 			}
+			else if(inputObj.cmd == cmd.SERV_REPORT_DAY) {
+				//日报表数据
+				serverdb.reportDay(connection, inputObj.data.time_from, inputObj.data.time_to);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_CLIENT_LIST) {
+				//获取客户端列表数据
+				serverdb.clientDataList(connection);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_CLIENT_ADD) {
+				//增加或更新客户端数据
+				serverdb.clientDataAdd(connection, inputObj.data);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_CLIENT_DELETE) {
+				//删除客户端数据
+				serverdb.clientDataDelete(connection, inputObj.data);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_MENU_CLASS_ADD) {
+				//增加或更新菜单分类数据
+				serverdb.clientMenuClassAdd(connection, inputObj.data);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_MENU_CLASS_DELETE) {
+				//删除菜单分类数据
+				serverdb.clientMenuClassDelete(connection, inputObj.data);				
+
+			}
 			else {
 				//命令参数错误
 				console.log(strings.COMMONS_MSG1);

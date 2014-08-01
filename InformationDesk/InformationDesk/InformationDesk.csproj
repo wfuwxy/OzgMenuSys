@@ -63,6 +63,7 @@
     <Compile Include="ClientForm.Designer.cs">
       <DependentUpon>ClientForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Commons.cs" />
     <Compile Include="ConnHelper.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
@@ -82,11 +83,11 @@
     <Compile Include="MenuForm.Designer.cs">
       <DependentUpon>MenuForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="OrderReportForm.cs">
+    <Compile Include="OrderDayReportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OrderReportForm.Designer.cs">
-      <DependentUpon>OrderReportForm.cs</DependentUpon>
+    <Compile Include="OrderDayReportForm.Designer.cs">
+      <DependentUpon>OrderDayReportForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -106,8 +107,8 @@
     <EmbeddedResource Include="MenuForm.resx">
       <DependentUpon>MenuForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OrderReportForm.resx">
-      <DependentUpon>OrderReportForm.cs</DependentUpon>
+    <EmbeddedResource Include="OrderDayReportForm.resx">
+      <DependentUpon>OrderDayReportForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

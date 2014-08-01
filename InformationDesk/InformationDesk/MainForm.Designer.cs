@@ -148,12 +148,13 @@
             this.OnlineList.FullRowSelect = true;
             this.OnlineList.GridLines = true;
             this.OnlineList.Location = new System.Drawing.Point(13, 29);
+            this.OnlineList.MultiSelect = false;
             this.OnlineList.Name = "OnlineList";
             this.OnlineList.Size = new System.Drawing.Size(609, 350);
             this.OnlineList.TabIndex = 1;
             this.OnlineList.UseCompatibleStateImageBehavior = false;
             this.OnlineList.View = System.Windows.Forms.View.Details;
-            this.OnlineList.Click += new System.EventHandler(this.OnlineList_Click);
+            this.OnlineList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OnlineList_MouseClick);
             // 
             // ClientItemMenuStrip
             // 
@@ -197,6 +198,5 @@
         private System.Windows.Forms.ToolStripMenuItem AboutToolStripMenuItem;
         private System.Windows.Forms.ListView OnlineList;
         private System.Windows.Forms.ContextMenuStrip ClientItemMenuStrip;
-        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem1;
     }
 }

@@ -28,18 +28,18 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.TextName = new System.Windows.Forms.TextBox();
             this.BtnAdd = new System.Windows.Forms.Button();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
-            this.BtnUpdate = new System.Windows.Forms.Button();
+            this.MenuClassList = new System.Windows.Forms.ComboBox();
+            this.BtnDelete = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // textBox1
+            // TextName
             // 
-            this.textBox1.Location = new System.Drawing.Point(47, 27);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(150, 21);
-            this.textBox1.TabIndex = 2;
+            this.TextName.Location = new System.Drawing.Point(47, 27);
+            this.TextName.Name = "TextName";
+            this.TextName.Size = new System.Drawing.Size(150, 21);
+            this.TextName.TabIndex = 2;
             // 
             // BtnAdd
             // 
@@ -49,33 +49,37 @@
             this.BtnAdd.TabIndex = 3;
             this.BtnAdd.Text = "button1";
             this.BtnAdd.UseVisualStyleBackColor = true;
+            this.BtnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
             // 
-            // comboBox1
+            // MenuClassList
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(47, 67);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(150, 20);
-            this.comboBox1.TabIndex = 4;
+            this.MenuClassList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.MenuClassList.FormattingEnabled = true;
+            this.MenuClassList.Location = new System.Drawing.Point(47, 67);
+            this.MenuClassList.Name = "MenuClassList";
+            this.MenuClassList.Size = new System.Drawing.Size(150, 20);
+            this.MenuClassList.TabIndex = 4;
+            this.MenuClassList.SelectedIndexChanged += new System.EventHandler(this.MenuClassList_SelectedIndexChanged);
             // 
-            // BtnUpdate
+            // BtnDelete
             // 
-            this.BtnUpdate.Location = new System.Drawing.Point(211, 63);
-            this.BtnUpdate.Name = "BtnUpdate";
-            this.BtnUpdate.Size = new System.Drawing.Size(75, 23);
-            this.BtnUpdate.TabIndex = 5;
-            this.BtnUpdate.Text = "button2";
-            this.BtnUpdate.UseVisualStyleBackColor = true;
+            this.BtnDelete.Location = new System.Drawing.Point(211, 63);
+            this.BtnDelete.Name = "BtnDelete";
+            this.BtnDelete.Size = new System.Drawing.Size(75, 23);
+            this.BtnDelete.TabIndex = 5;
+            this.BtnDelete.Text = "button2";
+            this.BtnDelete.UseVisualStyleBackColor = true;
+            this.BtnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
             // 
             // MenuClassForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(330, 118);
-            this.Controls.Add(this.BtnUpdate);
-            this.Controls.Add(this.comboBox1);
+            this.Controls.Add(this.BtnDelete);
+            this.Controls.Add(this.MenuClassList);
             this.Controls.Add(this.BtnAdd);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.TextName);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -89,9 +93,9 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox TextName;
         private System.Windows.Forms.Button BtnAdd;
-        private System.Windows.Forms.ComboBox comboBox1;
-        private System.Windows.Forms.Button BtnUpdate;
+        private System.Windows.Forms.ComboBox MenuClassList;
+        private System.Windows.Forms.Button BtnDelete;
     }
 }

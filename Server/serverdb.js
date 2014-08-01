@@ -151,7 +151,7 @@ exports.checkClient = function(connection) {
 //获取菜单分类列表
 exports.getMenuClassList = function(connection) {
 	var sql = "select * from menu_class order by id desc, sort desc";
-	writeDbData(connection, sql, cmd.CLIENT_WANT_MENUCLASS);
+	writeDbData(connection, sql, cmd.CLIENT_WANT_MENU_CLASS);
 };
 
 //获取一个菜单分类下面的菜单列表
@@ -210,9 +210,9 @@ function getMenuImage(connection, dataId, isSmall) {
 				
 				var outputStr = null;
 				if(isSmall)
-					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_SMALLIMG, data);
+					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_SMALL_IMAGE, data);
 				else
-					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_BIGIMG, data);
+					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_BIG_IMAGE, data);
 				connection.sendUTF(outputStr);
 			});
 			
@@ -293,7 +293,7 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 exports.getOrderList = function(connection) {
 	
 	var sql = "select od.*, o.update_time as o_update_time from order_detail as od left join `order` as o on od.order_id = o.id left join client as c on o.client_id = c.id where c.ip = '" + connection.remoteAddress + "' and o.status = 0";
-	writeDbData(connection, sql, cmd.CLIENT_WANT_ORDERLIST);
+	writeDbData(connection, sql, cmd.CLIENT_WANT_ORDER_LIST);
 };
 
 //当前客户端结帐
@@ -446,11 +446,11 @@ exports.closeClient = function(connection, targetClientIp) {
 var statClientData = null;
 function statClient(connection, rows, i) {
 	
-	if(statClientData == null)
-		statClientData = new Array();
-
 	db.get("select o.status as o_status, sum(od.price) as total_price from `order` as o left join order_detail as od on o.id = od.order_id where o.client_id = " + rows[i].id + " and o.status < 2", function(err, row) {
-		
+
+		if(statClientData == null)
+			statClientData = new Array();
+
 		var statClientDataItem = {};
 		statClientDataItem.o_status = row.o_status;
 		statClientDataItem.total_price = row.total_price;
@@ -490,6 +490,235 @@ exports.onlineList = function(connection) {
 					if(rows.length > 0)
 						statClient(connection, rows, 0);
 					
+				});
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+//日报表数据用到
+var reportDayData = null;
+function getReportDay(connection, timeFrom, timeTo) {
+	
+	if(timeFrom < timeTo) {
+		var tmpTimeTo = timeFrom + 86400;
+		var sql = "select count(t.id) as total, sum(t.quantity) as total_quantity, sum(t.price) as total_price from (select o.id, o.add_time, sum(od.price) as price, sum(od.quantity) as quantity from `order` as o left join order_detail as od on o.id = od.order_id where o.add_time >= " + timeFrom + " and o.add_time <= " + tmpTimeTo + " group by od.order_id) as t";
+
+		db.get(sql, function(err, row) {
+
+			if(reportDayData == null)
+				reportDayData = new Array();
+
+			var reportDayItem = {};
+			reportDayItem.total = row.total;
+			reportDayItem.total_quantity = row.total_quantity;
+			reportDayItem.total_price = row.total_price;
+			reportDayItem.time = timeFrom;
+			reportDayData.push(reportDayItem);
+
+			timeFrom = tmpTimeTo;
+			getReportDay(connection, timeFrom, timeTo);
+		});
+	}
+	else {
+		var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_REPORT_DAY, reportDayData);
+		connection.sendUTF(outputStr);
+
+		reportDayData = null;
+	}
+	
+}
+
+exports.reportDay = function(connection, timeFrom, timeTo) {
+	//日报表数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				getReportDay(connection, timeFrom, timeTo);
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.clientDataList = function(connection) {
+	//获取客户端列表数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				var sql = "select * from client order by id desc";
+				db.all(sql, function(err, rows) {
+					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_CLIENT_LIST, rows);
+					connection.sendUTF(outputStr);
+				});
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.clientDataAdd = function(connection, data) {
+	//增加或更新客户端数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				if(data.id == 0) {
+					var sql = "insert into client(ip, name, is_admin) values('" + data.ip + "', '" + data.name + "', " + data.is_admin + ")";
+					db.run(sql);
+				}
+				else {
+					var sql = "update client set ip = '" + data.ip + "', name = '" + data.name + "', is_admin = " + data.is_admin + " where id = " + data.id;
+					db.run(sql);
+				}
+
+				var sql = "select * from client order by id desc";
+				db.all(sql, function(err, rows) {
+					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_CLIENT_LIST, rows);
+					connection.sendUTF(outputStr);
+				});
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.clientDataDelete = function(connection, id) {
+	//删除客户端数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				if(id != 0) {
+					var sql = "delete from client where id = " + id;
+					db.run(sql);
+				}
+
+				var sql = "select * from client order by id desc";
+				db.all(sql, function(err, rows) {
+					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_CLIENT_LIST, rows);
+					connection.sendUTF(outputStr);
+				});
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.clientMenuClassAdd = function(connection, data) {
+	//增加或更新菜单分类数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				if(data.id == 0) {
+					var sql = "insert into menu_class(name) values('" + data.name + "')";
+					db.run(sql);
+				}
+				else {
+					var sql = "update menu_class set name = '" + data.name + "' where id = " + data.id;
+					db.run(sql);
+				}
+
+				var sql = "select * from menu_class order by id desc";
+				db.all(sql, function(err, rows) {
+					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_MENU_CLASS, rows);
+					connection.sendUTF(outputStr);
+				});
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.clientMenuClassDelete = function(connection, id) {
+	//删除菜单分类数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				if(id != 0) {
+					var sql = "delete from menu_class where id = " + id;
+					db.run(sql);
+					
+					//删除该类下面的菜单
+					sql = "delete from menu where class_id = " + id;
+					db.run(sql);
+				}
+
+				var sql = "select * from menu_class order by id desc";
+				db.all(sql, function(err, rows) {
+					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_MENU_CLASS, rows);
+					connection.sendUTF(outputStr);
 				});
 			}
 			else {

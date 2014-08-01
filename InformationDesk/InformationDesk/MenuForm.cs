@@ -29,10 +29,10 @@ namespace InformationDesk
             this.MenuDataList.SmallImageList = imageList;
 
             this.MenuDataList.Columns.Add("", 0);
-            this.MenuDataList.Columns.Add("名称", 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.MenuDataList.Columns.Add("价格", 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.MenuDataList.Columns.Add("类别", 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.MenuDataList.Columns.Add("时间", 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.MenuDataList.Columns.Add(Strings.MenuFormListTitle1, 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.MenuDataList.Columns.Add(Strings.MenuFormListTitle2, 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.MenuDataList.Columns.Add(Strings.MenuFormListTitle3, 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.MenuDataList.Columns.Add(Strings.MenuFormListTitle4, 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 
             //test
             ListViewItem[] p = new ListViewItem[4];

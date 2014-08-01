@@ -310,7 +310,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 				jsonData = new JSONObject(payload);
 
 				if(jsonData.has("cmd")) {
-					if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_MENUCLASS)) {
+					if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_MENU_CLASS)) {
 						//菜单分类数据
 						((MenuActivity)this.mContext).hideProgress();
 						
@@ -416,7 +416,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 						((MenuActivity)this.mContext).enabledView(true);
 					}
-					else if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_ORDERLIST)) {
+					else if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_ORDER_LIST)) {
 						//订单数据
 						((MenuActivity)this.mContext).hideProgress();
 						
@@ -511,7 +511,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 						((MenuActivity)this.mContext).enabledView(true);
 					}
-					else if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_BIGIMG)) {
+					else if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_BIG_IMAGE)) {
 						//大图
 						((MenuActivity)this.mContext).hideProgress();
 						
@@ -524,7 +524,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						
 				    	this.showBigImage(imgContent);
 					}
-					else if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_SMALLIMG)) {
+					else if(jsonData.getString("cmd").equals(AppConfig.CLIENT_WANT_SMALL_IMAGE)) {
 						//小图
 						
 						//保存图片本地缓存
