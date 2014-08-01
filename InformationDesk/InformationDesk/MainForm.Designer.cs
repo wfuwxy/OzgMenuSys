@@ -124,8 +124,8 @@
             // OrderReportToolStripMenuItem
             // 
             this.OrderReportToolStripMenuItem.Name = "OrderReportToolStripMenuItem";
-            this.OrderReportToolStripMenuItem.Size = new System.Drawing.Size(124, 22);
-            this.OrderReportToolStripMenuItem.Text = "订单报表";
+            this.OrderReportToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.OrderReportToolStripMenuItem.Text = "订单日销售报表";
             this.OrderReportToolStripMenuItem.Click += new System.EventHandler(this.OrderReportToolStripMenuItem_Click);
             // 
             // HelpToolStripMenuItem

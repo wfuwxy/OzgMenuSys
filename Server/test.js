@@ -24,19 +24,7 @@ client.on('connect', function(connection) {
 
     function sendNumber() {
         if (connection.connected) {
-
-			//开通
-			//var data = {
-				//"cmd": cmd.SERV_OPEN_CLIENT,
-				//"data": "192.168.1.105"
-			//};
 			
-			//归档
-			//var data = {
-				//"cmd": cmd.SERV_CLOSE_CLIENT,
-				//"data": "192.168.1.105"
-			//};
-
 			//sql注入测试
 			var data = {
 				"cmd": cmd.SERV_MENU_LIST,

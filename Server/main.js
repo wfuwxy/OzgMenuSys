@@ -50,6 +50,11 @@ wsServer.on("request", function(request) {
 	}
 	if(!existList)
 		clientList.push(connection);
+
+	//向服务台发出响应数据
+	//刷新服务台的数据
+	var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_GET_ONLINE_LIST);
+	serverdb.writeInformationDeskData(outputStr);
 	
     connection.on("message", function(message) {
         if (message.type === "utf8") {
@@ -117,11 +122,6 @@ wsServer.on("request", function(request) {
 				serverdb.closeClient(connection, clientIp);				
 
 			}
-			else if(inputObj.cmd == cmd.SERV_ISEND_CLIENT) {
-				//检测订单是否已归档
-				serverdb.isEndClient(connection);				
-
-			}
 			else if(inputObj.cmd == cmd.SERV_ONLINE_LIST) {
 				//在线列表
 				serverdb.onlineList(connection);				
@@ -131,7 +131,7 @@ wsServer.on("request", function(request) {
 				//命令参数错误
 				console.log(strings.COMMONS_MSG1);
 			
-				var outputStr = commons.outputJsonStr(0, strings.COMMONS_MSG1);
+				outputStr = commons.outputJsonStr(0, strings.COMMONS_MSG1);
 			
 				connection.sendUTF(outputStr);
 				connection.close();
@@ -156,6 +156,11 @@ wsServer.on("request", function(request) {
 		if(deleteIndex != -1)
 			clientList.splice(deleteIndex, 1);
 		//console.log(clientList.length);
+
+		//向服务台发出响应数据
+		//刷新服务台的数据
+		outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_GET_ONLINE_LIST);
+		serverdb.writeInformationDeskData(outputStr);
 
         console.log((new Date()) + " Peer " + connection.remoteAddress + " disconnected.");
     });

@@ -15,6 +15,23 @@ var clientList = new Array()
 exports.clientList = clientList; //客户端列表，里面的元素是connection对象
 
 //公用方法不用exports
+function writeInformationDeskData(dataStr) {
+	//向服务台发出数据
+
+	var sql = "select ip from client where is_admin = 1";
+	db.all(sql, function(err, rows) {						
+		for(var i = 0; i < rows.length; i++) {							
+			for(var j = 0; j < clientList.length; j++) {
+				if(rows[i].ip == clientList[j].remoteAddress) {
+					clientList[j].sendUTF(dataStr);
+				}
+			}
+		}						
+	});
+}
+exports.writeInformationDeskData = writeInformationDeskData;
+
+//公用方法不用exports
 function writeErrorIp(connection) {
 	console.log("查询不到ip为" + connection.remoteAddress + "的数据");
 			
@@ -25,13 +42,13 @@ function writeErrorIp(connection) {
 }
 
 //公用方法不用exports
-function writeDbData(connection, sql) {
+function writeDbData(connection, sql, cmdStr) {
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
 			
 			db.all(sql, function(err, rows) {
 
-				var outputStr = commons.outputJsonStr(1, "", "", rows);			
+				var outputStr = commons.outputJsonStr(1, "", cmdStr, rows);			
 				connection.sendUTF(outputStr);
 			});
 		}
@@ -71,11 +88,53 @@ exports.checkClient = function(connection) {
 				else if(row.status == 1) {
 					//已开通的逻辑
 					
-					var data = {
-						"client": row
-					};
-					var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMENU, data);
-					connection.sendUTF(outputStr);
+					//查询最新的一条订单数据
+					var sql = "select * from `order` where client_id = " + row.id + " order by id desc limit 1";
+					db.get(sql, function(err, row2) {
+						switch(row2.status) {
+							case 0:
+							{
+								//正在消费
+								var data = {
+									"client": row
+								};
+								var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMENU, data);
+								connection.sendUTF(outputStr);
+							}
+								break;
+							case 1:
+							{
+								//结账中
+								sql = "select sum(price) as total_price from order_detail where order_id = " + row2.id;
+								db.get(sql, function(err, row3) {
+									var outputStr = commons.outputJsonStr(1, commons.format(strings.MENU_PAYMENT_MSG1, row3.total_price), cmd.CLIENT_WANT_PAYMENT);
+									connection.sendUTF(outputStr);
+								});
+								
+							}
+								break;
+							case 2:
+							{
+								//归档
+
+								//重新生成一条订单数据
+								var addTime = (new Date()).getTime() / 1000;
+								var updateTime = addTime;
+								sql = "insert into `order` (add_time, update_time, client_id) values(" + parseInt(addTime) + ", " + parseInt(updateTime) + ", " + row.id + ")";
+								db.run(sql);
+								
+								//向客户端返回数据
+								var data = {
+									"client": row
+								};
+								var outputStr = commons.outputJsonStr(1, commons.format(strings.CHECK_MSG3, row.name), cmd.CLIENT_WANT_TOMENU, data);
+								connection.sendUTF(outputStr);
+							}
+								break;
+						}
+
+					});
+					
 				}
 			}			
 
@@ -92,7 +151,7 @@ exports.checkClient = function(connection) {
 //获取菜单分类列表
 exports.getMenuClassList = function(connection) {
 	var sql = "select * from menu_class order by id desc, sort desc";
-	writeDbData(connection, sql);
+	writeDbData(connection, sql, cmd.CLIENT_WANT_MENUCLASS);
 };
 
 //获取一个菜单分类下面的菜单列表
@@ -102,7 +161,7 @@ exports.getMenuList = function(connection, dataId) {
 		return;
 
 	var sql = "select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.class_id = " + dataId + " order by m.id desc, m.sort desc";
-	writeDbData(connection, sql);	
+	writeDbData(connection, sql, cmd.CLIENT_WANT_MENU);	
 };
 
 //获取一个菜单的详细数据
@@ -148,8 +207,12 @@ function getMenuImage(connection, dataId, isSmall) {
 				var data = {};
 				data.img_base64str = imgStr;
 				data.menu_data = row2;
-
-				var outputStr = commons.outputJsonStr(1, "", "", data);
+				
+				var outputStr = null;
+				if(isSmall)
+					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_SMALLIMG, data);
+				else
+					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_BIGIMG, data);
 				connection.sendUTF(outputStr);
 			});
 			
@@ -205,8 +268,14 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 					var updateTime = addTime;
 					db.run("update `order` set update_time = " + updateTime + " where id = " + row3.id);
 
-					var outputStr = commons.outputJsonStr(1, commons.format(strings.MENU_ADD_MSG, row2.name));
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.MENU_ADD_MSG, row2.name), cmd.CLIENT_WANT_ADDED_ORDER);
 					connection.sendUTF(outputStr);
+
+					//向服务台发出响应数据
+					//刷新服务台的数据
+					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_GET_ONLINE_LIST);
+					writeInformationDeskData(outputStr);
+
 				});
 			});
 		}
@@ -224,7 +293,7 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 exports.getOrderList = function(connection) {
 	
 	var sql = "select od.*, o.update_time as o_update_time from order_detail as od left join `order` as o on od.order_id = o.id left join client as c on o.client_id = c.id where c.ip = '" + connection.remoteAddress + "' and o.status = 0";
-	writeDbData(connection, sql);
+	writeDbData(connection, sql, cmd.CLIENT_WANT_ORDERLIST);
 };
 
 //当前客户端结帐
@@ -245,8 +314,13 @@ exports.orderPayment = function(connection) {
 					var sql = "update `order` set status = 1, update_time = " + parseInt(updateTime) + " where status = 0 and client_id = " + row.id;
 					db.run(sql);
 
-					var outputStr = commons.outputJsonStr(1, commons.format(strings.MENU_PAYMENT_MSG1, row2.total_price));
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.MENU_PAYMENT_MSG1, row2.total_price), cmd.CLIENT_WANT_PAYMENT);
 					connection.sendUTF(outputStr);
+
+					//向服务台发出响应数据
+					//刷新服务台的数据
+					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_GET_ONLINE_LIST);
+					writeInformationDeskData(outputStr);
 				}
 				else {
 					var outputStr = commons.outputJsonStr(0, strings.MENU_PAYMENT_MSG2);
@@ -264,34 +338,6 @@ exports.orderPayment = function(connection) {
 
 	});
 
-};
-
-exports.isEndClient = function(connection) {
-	//检测订单是否已归档
-	db.get(commons.format(chkClientSql2, connection.remoteAddress), function(err, row) {
-		if(row != undefined && row) {
-			
-			db.get("select count(id) as total from `order` where status < 2 and client_id = " + row.id, function(err, row2) {
-				if(row2.total > 0) {
-					//未归档
-					var outputStr = commons.outputJsonStr(0);
-					connection.sendUTF(outputStr);
-				}
-				else {
-					//已归档
-					var outputStr = commons.outputJsonStr(1);
-					connection.sendUTF(outputStr);
-				}
-			});
-						
-		}
-		else {
-			//查询不到数据
-			
-			writeErrorIp(connection);
-		}
-
-	});
 };
 
 exports.openClient = function(connection, targetClientIp) {
@@ -329,7 +375,7 @@ exports.openClient = function(connection, targetClientIp) {
 					}
 
 					//返回服务台的信息
-					outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG1, row2.name));
+					outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG1, row2.name), cmd.CLIENT_GET_ONLINE_LIST);
 					connection.sendUTF(outputStr);
 				});
 				
@@ -376,7 +422,7 @@ exports.closeClient = function(connection, targetClientIp) {
 					}
 
 					//返回服务台的信息
-					var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG2, row2.name));
+					var outputStr = commons.outputJsonStr(1, commons.format(strings.NOTICE_MSG2, row2.name), cmd.CLIENT_GET_ONLINE_LIST);
 					connection.sendUTF(outputStr);
 				});
 				

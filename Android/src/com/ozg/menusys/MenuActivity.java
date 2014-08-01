@@ -12,6 +12,7 @@ import de.tavendo.autobahn.WebSocketOptions;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.graphics.drawable.AnimationDrawable;
@@ -28,8 +29,6 @@ import android.widget.TextView;
 
 public class MenuActivity extends BaseActivity {
 		
-	public String mCmd = null;
-	
 	private ImageView mProgressView = null;
 	
 	@Override
@@ -38,6 +37,19 @@ public class MenuActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_menu);
 		
+		//订单状态出现特殊情况的处理
+		Intent intent = this.getIntent(); 
+		if(intent.hasExtra("cmd") && intent.hasExtra("message")) {
+			String cmd = intent.getStringExtra("cmd");
+			String message = intent.getStringExtra("message");
+			
+			if(cmd.equals(AppConfig.CLIENT_WANT_PAYMENT)) {		
+				ConnHelper.handler.mContext = this;
+				ConnHelper.handler.showPayment(message);
+				return;
+			}
+		}
+				
 		//视图相关
 		((Button)this.findViewById(R.id.btn_order)).setOnClickListener(new OnClickListener() {
 			@Override
@@ -97,12 +109,10 @@ public class MenuActivity extends BaseActivity {
 
 	public void getMenuClassList() {
 		this.showProgress();
-		
-		this.mCmd = AppConfig.SERV_MENU_CLASS_LIST;
-				
+						
 		JSONObject sendData = new JSONObject();
 		try {
-			sendData.put("cmd", this.mCmd);
+			sendData.put("cmd", AppConfig.SERV_MENU_CLASS_LIST);
 			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 		} catch (JSONException e) {
 
@@ -114,11 +124,10 @@ public class MenuActivity extends BaseActivity {
 	public void getMenuList(int dataId) {
 		this.showProgress();
 		
-		this.mCmd = AppConfig.SERV_MENU_LIST;
 		JSONObject sendData = new JSONObject();
 		try {
 			sendData.put("data", dataId);
-			sendData.put("cmd", this.mCmd);
+			sendData.put("cmd", AppConfig.SERV_MENU_LIST);
 			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
@@ -131,10 +140,9 @@ public class MenuActivity extends BaseActivity {
 	public void getOrderList() {
 		this.showProgress();
 		
-		this.mCmd = AppConfig.SERV_ORDER_LIST;
 		JSONObject sendData = new JSONObject();
 		try {
-			sendData.put("cmd", this.mCmd);
+			sendData.put("cmd", AppConfig.SERV_ORDER_LIST);
 			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
@@ -145,11 +153,10 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	private void getImage(int dataId, String cmd) {
-		this.mCmd = cmd;
 		JSONObject sendData = new JSONObject();
 		try {
 			sendData.put("data", dataId);
-			sendData.put("cmd", this.mCmd);
+			sendData.put("cmd", cmd);
 			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
@@ -210,7 +217,6 @@ public class MenuActivity extends BaseActivity {
 	public void addOrder(int menuId, int quantity) {
 		this.showProgress();
 		
-		this.mCmd = AppConfig.SERV_ADD_ORDER;
 		JSONObject sendData = new JSONObject();
 		try {
 			
@@ -219,7 +225,7 @@ public class MenuActivity extends BaseActivity {
 			data.put("quantity", quantity);
 			
 			sendData.put("data", data);
-			sendData.put("cmd", this.mCmd);			
+			sendData.put("cmd", AppConfig.SERV_ADD_ORDER);			
 			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
@@ -229,11 +235,10 @@ public class MenuActivity extends BaseActivity {
 	}
 	
 	public void payment() {
-		this.mCmd = AppConfig.SERV_PAYMENT;
 		JSONObject sendData = new JSONObject();
 		try {
 			
-			sendData.put("cmd", this.mCmd);			
+			sendData.put("cmd", AppConfig.SERV_PAYMENT);			
 			ConnHelper.getConnInstance(this).sendTextMessage(sendData.toString());
 			
 		} catch (JSONException e) {
