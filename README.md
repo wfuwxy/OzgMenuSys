@@ -9,6 +9,8 @@ Server目录为服务器端：
 
 使用nodejs + sqlite3 + websocket，需要安装的库请查看node_modules目录的描述文件，服务器启动：cd OzgMenuSys/Server，node main.js。
 
+upload目录下的图片均来自互联网。
+
 上传服务端的大图为1366*908的jpg。
 
 ================
