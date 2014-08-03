@@ -21,7 +21,9 @@ server.listen(cfg.SERVER_PORT, function() {
 
 var wsServer = new WebSocketServer({
     httpServer: server,
-    autoAcceptConnections: false
+    autoAcceptConnections: false,
+	maxReceivedFrameSize: 1024 * 1024,
+	maxReceivedMessageSize: 1024 * 1024
 });
 
 function originIsAllowed(origin) {
@@ -149,12 +151,22 @@ wsServer.on("request", function(request) {
 			}
 			else if(inputObj.cmd == cmd.SERV_MENU_CLASS_ADD) {
 				//增加或更新菜单分类数据
-				serverdb.clientMenuClassAdd(connection, inputObj.data);				
+				serverdb.menuClassAdd(connection, inputObj.data);				
 
 			}
 			else if(inputObj.cmd == cmd.SERV_MENU_CLASS_DELETE) {
 				//删除菜单分类数据
-				serverdb.clientMenuClassDelete(connection, inputObj.data);				
+				serverdb.menuClassDelete(connection, inputObj.data);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_MENU_ADD) {
+				//增加或更新菜单数据
+				serverdb.menuAdd(connection, inputObj.data);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_MENU_DELETE) {
+				//删除菜单数据
+				serverdb.menuDelete(connection, inputObj.data);				
 
 			}
 			else {

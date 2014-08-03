@@ -6,6 +6,7 @@ public class AppConfig {
 	public static String[] PROTOCOLS = { "echo-protocol" };
 	
 	public static long IMG_CACHE_TIMEOUT = 86400000; //图片缓存的超时时间
+	public static int RECONNECT_TIME = 3000;
 	
 	public static String APP_DATA = "APP_DATA";
 	

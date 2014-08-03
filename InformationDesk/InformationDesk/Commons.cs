@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -25,7 +26,7 @@ namespace InformationDesk
         {
             Match m = RegIPAddress.Match(inputData);
             return m.Success;
-        } 
+        }
 
     }
 }

@@ -12,10 +12,8 @@ using WebSocket4Net;
 
 namespace InformationDesk
 {
-    public partial class MainForm : Form
+    public partial class MainForm : BaseForm
     {
-        private WebSocket Connection;
-
         private List<int> InformationDeskIndices; //服务台的索引
         private Dictionary<int, string> ClientNameList; //一般客户端的名称列表
         private Dictionary<int, int> ClientOrderStatusList; //一般客户端的订单状态列表
@@ -33,7 +31,7 @@ namespace InformationDesk
         {
             this.Text = Strings.MainFormTitle;
 
-            this.Connection = ConnHelper.getConnInstance(this);
+            this.Connection = ConnHelper.GetConnInstance(this);
 
             //设置行高
             ImageList imageList = new ImageList();
@@ -69,7 +67,7 @@ namespace InformationDesk
 
         private void MenuDataToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.SubForm = new MenuForm();
+            this.SubForm = new MenuForm(this.Connection);
             this.SubForm.ShowDialog();
             this.SubForm = null;
         }
@@ -90,31 +88,49 @@ namespace InformationDesk
 
         public void WebSocket_Opened(object sender, EventArgs e)
         {
+            this.Text = Strings.MainFormConnectedTitle;
+
             JsonObjectCollection jsonData = new JsonObjectCollection();
             jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CHK_CLIENT));
-            this.Connection.Send(jsonData.ToString());
+            ConnHelper.SendString(jsonData.ToString());
         }
 
         public void WebSocket_Closed(object sender, EventArgs e)
         {
+            //发生错误或链接不上都会触发这里，直接关闭程序不会触发这里
+            this.Text = Strings.MainFormNotConnectTitle;
+            this.OnlineList.Items.Clear();
 
+            ConnHelper.Reconnect();
         }
-
+        
         public void WebSocket_MessageReceived(object sender, MessageReceivedEventArgs e)
         {
             JsonTextParser parser = new JsonTextParser();
-            JsonObjectCollection jsonData = (JsonObjectCollection)parser.Parse(e.Message);
+            JsonObjectCollection jsonData = (JsonObjectCollection)parser.Parse(e.Message); 
             if (((JsonNumericValue)jsonData["ok"]).Value == 1)
             {
                 //子窗口相关
                 if (this.SubForm != null)
                 {
                     if (this.SubForm is OrderDayReportForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_REPORT_DAY))                    
-                        ((OrderDayReportForm)this.SubForm).ShowData(e.Message);
+                        ((OrderDayReportForm)this.SubForm).ShowData(e.Message); //订单日报表
                     else if (this.SubForm is ClientForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_CLIENT_LIST))
-                        ((ClientForm)this.SubForm).ShowData(e.Message);
+                        ((ClientForm)this.SubForm).ShowData(e.Message); //客户端管理
                     else if (this.SubForm is MenuClassForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_MENU_CLASS))
-                        ((MenuClassForm)this.SubForm).ShowData(e.Message);
+                        ((MenuClassForm)this.SubForm).ShowData(e.Message); //菜单分类
+                    else if (this.SubForm is MenuForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_MENU_CLASS))
+                        ((MenuForm)this.SubForm).ShowData(e.Message); //菜单列表的分类部分
+                    else if (this.SubForm is MenuForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_MENU))
+                        ((MenuForm)this.SubForm).ShowData(e.Message); //菜单列表的数据部分
+                    else if (this.SubForm is MenuForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_BIG_IMAGE))
+                    {
+                        if (((MenuForm)this.SubForm).SubForm != null && ((MenuAddForm)((MenuForm)this.SubForm).SubForm).SubForm != null)
+                            ((MenuBigImgViewForm)((MenuAddForm)((MenuForm)this.SubForm).SubForm).SubForm).ShowData(e.Message); //菜单显示图片
+                    }
+                    else if (this.SubForm is MenuForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_SELECTED_MENU_CLASS))                    
+                        ((MenuForm)this.SubForm).MenuClassListSelectedWithID((int)((JsonNumericValue)jsonData["data"]).Value); //添加修改删除菜单数据后更新菜单数据列表
+                    
                 }
 
                 if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_TOMAIN) || ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_GET_ONLINE_LIST))
@@ -122,7 +138,7 @@ namespace InformationDesk
                     //发送获取在线列表的请求
                     jsonData = new JsonObjectCollection();
                     jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_ONLINE_LIST));
-                    this.Connection.Send(jsonData.ToString());
+                    ConnHelper.SendString(jsonData.ToString());
                 }
                 else if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_ONLINE_LIST))
                 { 
@@ -188,7 +204,8 @@ namespace InformationDesk
 
         public void WebSocket_Error(object sender, SuperSocket.ClientEngine.ErrorEventArgs e)
         {
-            MessageBox.Show(e.Exception.Message);
+            //MessageBox.Show(e.Exception.Message);
+                        
         }
 
         private void OnlineList_MouseClick(object sender, MouseEventArgs e)
@@ -212,7 +229,7 @@ namespace InformationDesk
                                 JsonObjectCollection jsonData = new JsonObjectCollection();
                                 jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_OPEN_CLIENT));
                                 jsonData.Add(new JsonStringValue("data", this.OnlineList.SelectedItems[0].SubItems[2].Text));
-                                this.Connection.Send(jsonData.ToString());
+                                ConnHelper.SendString(jsonData.ToString());
                             }
                         }
                         else
@@ -227,7 +244,7 @@ namespace InformationDesk
                                     JsonObjectCollection jsonData = new JsonObjectCollection();
                                     jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CLOSE_CLIENT));
                                     jsonData.Add(new JsonStringValue("data", this.OnlineList.SelectedItems[0].SubItems[2].Text));
-                                    this.Connection.Send(jsonData.ToString());
+                                    ConnHelper.SendString(jsonData.ToString());
                                 }
                             }
                         }

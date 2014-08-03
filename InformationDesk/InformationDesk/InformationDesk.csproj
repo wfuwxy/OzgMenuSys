@@ -57,6 +57,9 @@
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
     <Compile Include="AppConfig.cs" />
+    <Compile Include="BaseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="ClientForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,6 +73,18 @@
     </Compile>
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuAddForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MenuAddForm.Designer.cs">
+      <DependentUpon>MenuAddForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuBigImgViewForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MenuBigImgViewForm.Designer.cs">
+      <DependentUpon>MenuBigImgViewForm.cs</DependentUpon>
     </Compile>
     <Compile Include="MenuClassForm.cs">
       <SubType>Form</SubType>
@@ -100,6 +115,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MenuAddForm.resx">
+      <DependentUpon>MenuAddForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MenuBigImgViewForm.resx">
+      <DependentUpon>MenuBigImgViewForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="MenuClassForm.resx">
       <DependentUpon>MenuClassForm.cs</DependentUpon>

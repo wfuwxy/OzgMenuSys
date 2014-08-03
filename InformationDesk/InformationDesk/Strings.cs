@@ -15,6 +15,8 @@ namespace InformationDesk
         public static string CommonsClientIsAdmin1 = "服务台"; 
 
         public static string MainFormTitle = "Ozg点餐系统-服务台";
+        public static string MainFormNotConnectTitle = "Ozg点餐系统-服务台（未链接服务器）";
+        public static string MainFormConnectedTitle = "Ozg点餐系统-服务台（链接中）";
         public static string MainFormDialogOpenClientMsg1 = "确认开通[{0}]！";
         public static string MainFormDialogOpenClientMsg2 = "确认归档[{0}]的订单！";
         public static string MainFormListTitle1 = "名称";
@@ -42,6 +44,13 @@ namespace InformationDesk
         public static string MenuFormListTitle2 = "价格";
         public static string MenuFormListTitle3 = "类别";
         public static string MenuFormListTitle4 = "时间";
+        public static string MenuFormListFirst = "请选择菜单分类...";
+
+        public static string MenuAddFormTitle = "Ozg点餐系统-菜单数据-新增&修改";
+        public static string MenuAddFormClassListFirst = "请选择菜单分类...";
+        public static string MenuAddFormBtnUpdate = "更新";
+        public static string MenuAddFormMsg1 = "图片路径为空";
+        public static string MenuAddFormMsg2 = "请选择分类";
 
         public static string ClientFormTitle = "Ozg点餐系统-客户端管理";
         public static string ClientFormListTitle1 = "名称";
@@ -57,7 +66,7 @@ namespace InformationDesk
         public static string OrderDayReportFormListTitle1 = "日期";
         public static string OrderDayReportFormListTitle2 = "订单数";
         public static string OrderDayReportFormListTitle3 = "上菜数";
-        public static string OrderDayReportFormListTitle4 = "金额";
+        public static string OrderDayReportFormListTitle4 = "销售总额";
 
         public static string AboutFormTitle = "关于 Ozg点餐系统";
         public static string AboutFormLabContent = "Ozg点餐系统 Ver {0}";

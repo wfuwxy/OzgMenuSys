@@ -12,10 +12,8 @@ using WebSocket4Net;
 
 namespace InformationDesk
 {
-    public partial class OrderDayReportForm : Form
+    public partial class OrderDayReportForm : BaseForm
     {
-        private WebSocket Connection;
-
         public OrderDayReportForm(WebSocket Connection)
         {
             this.Connection = Connection;
@@ -74,7 +72,7 @@ namespace InformationDesk
             JsonObjectCollection jsonData = new JsonObjectCollection();
             jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_REPORT_DAY));
             jsonData.Add(new JsonObjectCollection("data", data));
-            this.Connection.Send(jsonData.ToString());
+            ConnHelper.SendString(jsonData.ToString());
 
         }
 

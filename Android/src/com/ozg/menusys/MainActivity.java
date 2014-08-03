@@ -27,13 +27,19 @@ public class MainActivity extends BaseActivity {
 		// TODO Auto-generated method stub
 		super.onActivityResult(requestCode, resultCode, data);
 
-		JSONObject jsonData = new JSONObject();		
-		try {
-			jsonData.put("cmd", AppConfig.SERV_CHK_CLIENT);				
-			ConnHelper.getConnInstance(this).sendTextMessage(jsonData.toString());
-        	
-		} catch (JSONException e) {
-			e.printStackTrace();			
+		if(ConnHelper.getConnInstance(this).isConnected()) {
+			JSONObject jsonData = new JSONObject();		
+			try {
+				jsonData.put("cmd", AppConfig.SERV_CHK_CLIENT);				
+				ConnHelper.getConnInstance(this).sendTextMessage(jsonData.toString());
+	        	
+			} catch (JSONException e) {
+				e.printStackTrace();			
+			}
+		}
+		else {
+			//重新链接
+			ConnHelper.reconnect();
 		}
 		
 	}
@@ -62,24 +68,7 @@ public class MainActivity extends BaseActivity {
 	    	//视图相关
 			TextView labMsg = (TextView)this.findViewById(R.id.main_lab_msg);
 			labMsg.setTextSize(24.0f);
-			
-//			Button btn = (Button)this.findViewById(R.id.main_btn);
-//			btn.setGravity(View.GONE);
-//			btn.setTextSize(24.0f);
-//			btn.setOnClickListener(new OnClickListener() {
-//	
-//				@Override
-//				public void onClick(View v) {
-//										
-//					SharedPreferences sp = MainActivity.this.getSharedPreferences(AppConfig.APP_DATA, Context.MODE_PRIVATE);					
-//					if(ConnHelper.getConnInstance(MainActivity.this).isConnected() && sp.contains(AppConfig.CLIENT_DATA)) {
-//						Log.d("ozgtest", "进入菜单界面");
-//
-//					}
-//					
-//				}
-//			});
-			
+						
 			//socket相关
 			ConnHelper.getConnInstance(this);
 	    }

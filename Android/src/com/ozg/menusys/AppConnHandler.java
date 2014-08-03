@@ -56,7 +56,9 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 	private View mCurrShowMainView = null;
 	
 	private View mMaskView = null;
-		
+	
+	private int mSelectedMenuClassID = 0;
+	
 	 //获取菜单分类列表数据后显示时用到
 	private class MenuClassItemOnClickListener implements OnClickListener {
 		
@@ -71,6 +73,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 			
 			((Button)v).setTextColor(Color.RED);
 			
+			AppConnHandler.this.mSelectedMenuClassID = this.getMenuClassId();
 			((MenuActivity)AppConnHandler.this.mContext).getMenuList(this.getMenuClassId());
 		}
 
@@ -208,12 +211,20 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 	@Override
 	public void onClose(int code, String reason) {
 		
-		Log.d("ozgtest", "Connection lost.");
+		Log.d("ozgtest", "echo: connection lost.");
     			
 		if((Activity)this.mContext instanceof MainActivity) {
+						
 			Button btn = (Button)((MainActivity)this.mContext).findViewById(R.id.main_btn);
 	    	btn.setGravity(View.VISIBLE);
-			btn.setText(R.string.main_btn_text2);			
+			btn.setText(R.string.main_btn_text2);		
+			
+			//重新链接
+			ConnHelper.reconnect();
+		}
+		else if((Activity)this.mContext instanceof MenuActivity) {
+			//退回到第一个界面再重新链接
+			((MenuActivity)this.mContext).finish();
 		}
 		    	
 	}
@@ -315,6 +326,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 						((MenuActivity)this.mContext).hideProgress();
 						
 						LinearLayout menuClassSvLayout = (LinearLayout)((MenuActivity)this.mContext).findViewById(R.id.menu_class_sv_layout);
+						menuClassSvLayout.removeAllViews();
 						
 						if(jsonData.getInt("ok") == 1) {
 							
@@ -331,7 +343,10 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								classBtn.setText(item.getString("name"));
 								classBtn.setOnClickListener(l);
 								
-								if(i == 0)
+								//选定一个分类
+								if(i == 0 && this.mSelectedMenuClassID == 0)
+									classBtn.setTextColor(Color.RED);
+								else if(this.mSelectedMenuClassID > 0 && item.getInt("id") == this.mSelectedMenuClassID)
 									classBtn.setTextColor(Color.RED);
 								
 								menuClassSvLayout.addView(classItem);
@@ -340,8 +355,14 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 							
 							if(data.length() > 0) {
 								//默认
-								JSONObject item = data.getJSONObject(0);
-								((MenuActivity)this.mContext).getMenuList(item.getInt("id"));
+								
+								if(this.mSelectedMenuClassID == 0) {
+									JSONObject item = data.getJSONObject(0);									
+									this.mSelectedMenuClassID = item.getInt("id");
+									((MenuActivity)this.mContext).getMenuList(item.getInt("id"));
+								}
+								else
+									((MenuActivity)this.mContext).getMenuList(this.mSelectedMenuClassID);
 								
 							}
 							else {
@@ -377,6 +398,9 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 							
 							this.mCurrShowMainView = View.inflate(this.mContext, R.layout.menu_list, null);
 							
+							LinearLayout menuListRootLayout = ((LinearLayout)this.mCurrShowMainView.findViewById(R.id.menu_list_root_layout));
+							menuListRootLayout.removeAllViews();
+							
 							//固定索引是为了确保显示在进度条的下面
 							menuRoot.addView(this.mCurrShowMainView, 1, lp);
 													
@@ -385,7 +409,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								JSONObject item = menuData.getJSONObject(i);
 															
 								View menuItem = View.inflate(this.mContext, R.layout.menu_item, null);
-								((LinearLayout)this.mCurrShowMainView.findViewById(R.id.menu_list_root_layout)).addView(menuItem);
+								menuListRootLayout.addView(menuItem);
 								
 								TextView labName = (TextView)menuItem.findViewById(R.id.menu_item_lab_name);
 								labName.setText(item.getString("name"));

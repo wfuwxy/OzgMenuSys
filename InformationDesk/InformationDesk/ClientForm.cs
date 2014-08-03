@@ -12,9 +12,8 @@ using WebSocket4Net;
 
 namespace InformationDesk
 {
-    public partial class ClientForm : Form
+    public partial class ClientForm : BaseForm
     {
-        private WebSocket Connection;
         private List<int> ClientIDList;
         private int SelectedID = 0;
 
@@ -42,7 +41,7 @@ namespace InformationDesk
             //获取客户端列表数据
             JsonObjectCollection jsonData = new JsonObjectCollection();
             jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CLIENT_LIST));
-            this.Connection.Send(jsonData.ToString());
+            ConnHelper.SendString(jsonData.ToString());
         }
 
         private void BtnAdd_Click(object sender, EventArgs e)
@@ -73,7 +72,7 @@ namespace InformationDesk
             JsonObjectCollection jsonData = new JsonObjectCollection();
             jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CLIENT_ADD));
             jsonData.Add(new JsonObjectCollection("data", data));
-            this.Connection.Send(jsonData.ToString());
+            ConnHelper.SendString(jsonData.ToString());
         }
 
         public void ShowData(string jsonStr)
@@ -135,7 +134,7 @@ namespace InformationDesk
                 JsonObjectCollection jsonData = new JsonObjectCollection();
                 jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_CLIENT_DELETE));
                 jsonData.Add(new JsonNumericValue("data", this.SelectedID));
-                this.Connection.Send(jsonData.ToString());
+                ConnHelper.SendString(jsonData.ToString());
 
                 this.SelectedID = 0;
                 TextName.Text = "";

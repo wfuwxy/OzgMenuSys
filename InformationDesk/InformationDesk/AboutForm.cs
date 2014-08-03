@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace InformationDesk
 {
-    public partial class AboutForm : Form
+    public partial class AboutForm : BaseForm
     {
         public AboutForm()
         {

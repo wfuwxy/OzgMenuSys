@@ -3,8 +3,9 @@ var cfg = require("./cfg");
 var cmd = require("./cmd");
 var strings = require("./strings");
 var commons = require("./commons");
-var fs = require('fs');
+var fs = require("fs");
 var sqlite3 = require("sqlite3").verbose();
+var im = require("imagemagick");
 
 var db = new sqlite3.Database(cfg.DB_PATH);   
 
@@ -15,10 +16,13 @@ var clientList = new Array()
 exports.clientList = clientList; //客户端列表，里面的元素是connection对象
 
 //公用方法不用exports
-function writeInformationDeskData(dataStr) {
-	//向服务台发出数据
+function writeInformationDeskData(dataStr, isAdmin) {
+	//向客户端或服务台发出数据
+	
+	if(isAdmin == undefined)
+		isAdmin = 1;
 
-	var sql = "select ip from client where is_admin = 1";
+	var sql = "select ip from client where is_admin = " + isAdmin;
 	db.all(sql, function(err, rows) {						
 		for(var i = 0; i < rows.length; i++) {							
 			for(var j = 0; j < clientList.length; j++) {
@@ -156,9 +160,7 @@ exports.getMenuClassList = function(connection) {
 
 //获取一个菜单分类下面的菜单列表
 exports.getMenuList = function(connection, dataId) {
-	dataId = commons.sqlValid(connection, dataId, strings.COMMONS_MSG2);
-	if(!dataId)
-		return;
+	dataId = parseInt(dataId);
 
 	var sql = "select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.class_id = " + dataId + " order by m.id desc, m.sort desc";
 	writeDbData(connection, sql, cmd.CLIENT_WANT_MENU);	
@@ -168,9 +170,7 @@ exports.getMenuList = function(connection, dataId) {
 /*exports.getMenuDetail = function(connection, dataId) {	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
-			dataId = commons.sqlValid(connection, dataId, strings.COMMONS_MSG2);
-			if(!dataId)
-				return;
+			dataId = parseInt(dataId);
 
 			db.get("select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.id = " + dataId, function(err, row) {
 
@@ -193,9 +193,7 @@ function getMenuImage(connection, dataId, isSmall) {
 	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
-			dataId = commons.sqlValid(connection, dataId, strings.COMMONS_MSG2);
-			if(!dataId)
-				return;
+			dataId = parseInt(dataId);
 
 			db.get("select m.*, mc.name as mc_name from menu as m inner join menu_class as mc on m.class_id = mc.id where m.id = " + dataId, function(err, row2) {
 				var imgStr = null;
@@ -249,9 +247,7 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 	
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
-			menuId = commons.sqlValid(connection, menuId, strings.COMMONS_MSG2);
-			if(!menuId)
-				return;
+			menuId = parseInt(menuId);
 
 			db.get("select * from menu where id = " + menuId, function(err, row2) {
 				
@@ -599,6 +595,11 @@ exports.clientDataAdd = function(connection, data) {
 									
 			if(row.is_admin == 1) {
 				
+				data.ip = commons.sqlValid(connection, data.ip, strings.COMMONS_MSG2);
+				data.name = commons.sqlValid(connection, data.name, strings.COMMONS_MSG2);
+				data.is_admin = parseInt(data.is_admin);
+				data.id = parseInt(data.id);
+
 				if(data.id == 0) {
 					var sql = "insert into client(ip, name, is_admin) values('" + data.ip + "', '" + data.name + "', " + data.is_admin + ")";
 					db.run(sql);
@@ -636,6 +637,8 @@ exports.clientDataDelete = function(connection, id) {
 									
 			if(row.is_admin == 1) {
 				
+				id = parseInt(id);
+
 				if(id != 0) {
 					var sql = "delete from client where id = " + id;
 					db.run(sql);
@@ -662,13 +665,16 @@ exports.clientDataDelete = function(connection, id) {
 	});
 };
 
-exports.clientMenuClassAdd = function(connection, data) {
+exports.menuClassAdd = function(connection, data) {
 	//增加或更新菜单分类数据
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
 									
 			if(row.is_admin == 1) {
 				
+				data.id = parseInt(data.id);
+				data.name = commons.sqlValid(connection, data.name, strings.COMMONS_MSG2);
+
 				if(data.id == 0) {
 					var sql = "insert into menu_class(name) values('" + data.name + "')";
 					db.run(sql);
@@ -677,11 +683,62 @@ exports.clientMenuClassAdd = function(connection, data) {
 					var sql = "update menu_class set name = '" + data.name + "' where id = " + data.id;
 					db.run(sql);
 				}
+				
+				
+				var sql = "select * from menu_class order by id desc";
+				db.all(sql, function(err, rows) {
+					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_MENU_CLASS, rows);
+
+					//向服务台返回数据
+					connection.sendUTF(outputStr);
+
+					//向客户端返回数据
+					writeInformationDeskData(outputStr, 0);
+				});
+				
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.menuClassDelete = function(connection, id) {
+	//删除菜单分类数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				id = parseInt(id);
+
+				if(id != 0) {
+					var sql = "delete from menu_class where id = " + id;
+					db.run(sql);
+					
+					//删除该类下面的菜单
+					sql = "delete from menu where class_id = " + id;
+					db.run(sql);
+				}
 
 				var sql = "select * from menu_class order by id desc";
 				db.all(sql, function(err, rows) {
 					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_MENU_CLASS, rows);
+
+					//向服务台返回数据
 					connection.sendUTF(outputStr);
+
+					//向客户端返回数据
+					writeInformationDeskData(outputStr, 0);
 				});
 			}
 			else {
@@ -699,27 +756,103 @@ exports.clientMenuClassAdd = function(connection, data) {
 	});
 };
 
-exports.clientMenuClassDelete = function(connection, id) {
+exports.menuAdd = function(connection, data) {
+	//增加或更新菜单分类数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				var imgBase64Str = data.img_base64str;
+				var menuData = data.menu_data;
+				
+				var bigImg = null;
+				var smallImg = null;
+				if(imgBase64Str) {
+					var d = new Date();
+					bigImg = "upload/" + d.format("yyyyMMddhhmmss") + ".jpg";
+					smallImg = "upload/" + d.format("yyyyMMddhhmmss") + "_small.jpg";
+					
+					commons.fileBase64Decode(imgBase64Str, bigImg);
+
+					//缩小图片
+					im.resize({
+						srcData: fs.readFileSync("./" + bigImg, "binary"),
+						width: 350,
+						height: 233
+					}, 
+					function(err, stdout, stderr){
+						if (err) throw err
+						fs.writeFileSync("./" + smallImg, stdout, "binary");
+						console.log("resized " + bigImg + " to fit within 350x233px")
+					});
+
+				}
+
+				menuData.name = commons.sqlValid(connection, menuData.name, strings.COMMONS_MSG2);
+				menuData.price = parseFloat(menuData.price);
+				menuData.class_id = parseInt(menuData.class_id);
+				menuData.id = parseInt(menuData.id);
+
+				var sql = null;
+				if(menuData.id == 0) {
+					var addTime = (new Date()).getTime() / 1000;
+										
+					if(bigImg == null)
+						sql = "insert into menu(name, price, add_time, class_id) values('" + menuData.name + "', " + menuData.price + ", " + parseInt(addTime) + ", " + menuData.class_id + ")";
+					else
+						sql = "insert into menu(name, price, add_time, class_id, big_img, small_img) values('" + menuData.name + "', " + menuData.price + ", " + parseInt(addTime) + ", " + menuData.class_id + ", '" + bigImg + "', '" + smallImg + "')";
+					db.run(sql);
+				}
+				else {
+					var sql = null;
+					if(bigImg == null)
+						sql = "update menu set name = '" + menuData.name + "', price = " + menuData.price + ", class_id = " + menuData.class_id + " where id = " + menuData.id;
+					else
+						sql = "update menu set name = '" + menuData.name + "', price = " + menuData.price + ", class_id = " + menuData.class_id + ", big_img = '" + bigImg + "', small_img = '" + smallImg + "' where id = " + menuData.id;
+					db.run(sql);
+				}
+								
+				//向服务台返回数据
+				var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_SELECTED_MENU_CLASS, menuData.class_id);
+				connection.sendUTF(outputStr);
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.menuDelete = function(connection, id) {
 	//删除菜单分类数据
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
 									
 			if(row.is_admin == 1) {
 				
-				if(id != 0) {
-					var sql = "delete from menu_class where id = " + id;
-					db.run(sql);
-					
-					//删除该类下面的菜单
-					sql = "delete from menu where class_id = " + id;
-					db.run(sql);
-				}
+				id = parseInt(id);
 
-				var sql = "select * from menu_class order by id desc";
-				db.all(sql, function(err, rows) {
-					var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_MENU_CLASS, rows);
-					connection.sendUTF(outputStr);
-				});
+				if(id != 0) {
+
+					db.get("select * from menu where id = " + id, function(err, row2) {
+						var sql = "delete from menu where id = " + id;
+						db.run(sql);
+
+						//向服务台返回数据
+						var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_SELECTED_MENU_CLASS, row2.class_id);
+						connection.sendUTF(outputStr);
+					});					
+				}				
+				
 			}
 			else {
 				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
