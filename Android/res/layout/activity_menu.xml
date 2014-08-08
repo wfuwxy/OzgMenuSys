@@ -16,7 +16,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:scrollbars="none"
-	    	android:fadingEdge="none" >
+	    android:fadingEdge="none"
+	    android:layout_marginTop="100dp" >
 
             <LinearLayout
                 android:id="@+id/menu_class_sv_layout"
