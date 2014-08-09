@@ -8,7 +8,7 @@ namespace InformationDesk
 {
     public class AppConfig
     {
-        public static string SERV = "ws://192.168.1.10:8765";
+        public static string SERV = "ws://192.168.1.101:8765";
         public static string PROTOCOL = "echo-protocol";
         public static int RECONNECT_TIME = 3000;
 

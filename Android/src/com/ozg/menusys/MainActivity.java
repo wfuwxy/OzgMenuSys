@@ -13,7 +13,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -64,11 +66,16 @@ public class MainActivity extends BaseActivity {
 		
 	    if(this.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
 	        //当前为横屏， 在此处添加额外的处理代码
-	    		    	
-	    	//视图相关
-			TextView labMsg = (TextView)this.findViewById(R.id.main_lab_msg);
-			labMsg.setTextSize(24.0f);
-						
+	    	
+	    	//test
+//	    	DisplayMetrics mDisplayMetrics = new DisplayMetrics();
+//	    	getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+//	    	int w = mDisplayMetrics.widthPixels;
+//	    	int h = mDisplayMetrics.heightPixels;
+	    	//Log.d("ozg test", "echo " + String.valueOf(w));
+	    	//Log.d("ozg test", "echo " + String.valueOf(h));
+	    	//Commons.alertErrMsg(this, "width " + String.valueOf(w) + " height " + String.valueOf(h));
+	    	
 			//socket相关
 			ConnHelper.getConnInstance(this);
 	    }

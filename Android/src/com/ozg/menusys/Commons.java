@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
@@ -18,6 +19,7 @@ import android.graphics.PixelFormat;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -83,11 +85,7 @@ public class Commons {
 		Toast toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
 		toast.show();
 	}
-	
-	public static int getSamllImgSize(int val) {
-		return (int)((float)val * 8.0f);
-	}
-	
+			
 	public static void imgCacheWrite(Context context, String cacheImgFileName, String imgBase64Str) {
 		File cacheImgFile = new File(context.getFilesDir() + "/" + cacheImgFileName);
     	if(cacheImgFile.exists()) {
@@ -138,5 +136,23 @@ public class Commons {
 			return null;
 		}
 	}
-		
+	
+	//自适应X坐标或宽度
+	public static float computeX(Activity activity, float val) {
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+    	int w = displayMetrics.widthPixels;
+    	
+		return val * ((float)w / 2000.0f);
+	}
+	
+	//自适应Y坐标或高度
+	public static float computeY(Activity activity, float val) {
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+    	int h = displayMetrics.heightPixels;
+    	
+		return val * ((float)h / 1200.0f);
+	}
+	
 }

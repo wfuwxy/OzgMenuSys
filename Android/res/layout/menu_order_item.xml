@@ -9,9 +9,9 @@
          android:layout_height="35dp"
          android:layout_alignParentLeft="true"
          android:layout_alignParentTop="true"
-         android:layout_marginLeft="20dp"
+         android:layout_marginLeft="30dp"
          android:layout_marginTop="15dp"
-         android:textSize="18sp"
+         android:textSize="12sp"
          android:id="@+id/menu_order_item_name" />
      
 	 <TextView
@@ -19,9 +19,9 @@
          android:layout_height="35dp"
          android:layout_alignParentLeft="true"
          android:layout_alignParentTop="true"
-         android:layout_marginLeft="248dp"
+         android:layout_marginLeft="140dp"
          android:layout_marginTop="15dp"
-         android:textSize="18sp"
+         android:textSize="12sp"
          android:id="@+id/menu_order_item_quantity" />
 	
      <TextView
@@ -29,9 +29,9 @@
          android:layout_height="35dp"
          android:layout_alignParentLeft="true"
          android:layout_alignParentTop="true"
-         android:layout_marginLeft="325dp"
+         android:layout_marginLeft="210dp"
          android:layout_marginTop="15dp"
-         android:textSize="18sp"
+         android:textSize="12sp"
          android:id="@+id/menu_order_item_price" />
      
      <TextView
@@ -39,9 +39,9 @@
          android:layout_height="35dp"
          android:layout_alignParentLeft="true"
          android:layout_alignParentTop="true"
-         android:layout_marginLeft="415dp"
+         android:layout_marginLeft="290dp"
          android:layout_marginTop="15dp"
-         android:textSize="18sp"
+         android:textSize="12sp"
          android:id="@+id/menu_order_item_time" />
         
 </RelativeLayout>

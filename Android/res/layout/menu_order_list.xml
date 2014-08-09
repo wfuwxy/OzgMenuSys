@@ -15,9 +15,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="80dp"
+            android:layout_marginLeft="30dp"
             android:text="@string/menu_title_name"
-            android:textSize="22sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
         
         <TextView
@@ -25,9 +25,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="230dp"
+            android:layout_marginLeft="130dp"
             android:text="@string/menu_title_quantity"
-            android:textSize="22sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
         
         <TextView
@@ -35,9 +35,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="330dp"
+            android:layout_marginLeft="210dp"
             android:text="@string/menu_title_price"
-            android:textSize="22sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
         
         <TextView
@@ -45,9 +45,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="430dp"
+            android:layout_marginLeft="290dp"
             android:text="@string/menu_title_time"
-            android:textSize="22sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
         
     </RelativeLayout>

@@ -389,9 +389,9 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								this.mCurrShowMainView = null;
 							}
 													
-							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(2560, 1920);		
-							lp.leftMargin = 550;
-							lp.topMargin = 110;
+							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(2000, 1200);		
+							lp.leftMargin = (int)Commons.computeX((Activity)this.mContext, 700.0f);
+							lp.topMargin = (int)Commons.computeY((Activity)this.mContext, 150.0f);
 							lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 							lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 							lp.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
@@ -453,8 +453,8 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								this.mCurrShowMainView = null;
 							}
 							
-							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(2560, 1920);		
-							lp.leftMargin = 550;
+							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(2000, 1200);		
+							lp.leftMargin = (int)Commons.computeX((Activity)this.mContext, 700.0f);
 							lp.topMargin = 0;
 							lp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
 							lp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
@@ -507,22 +507,22 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								
 								orderItemName.setText("总价");
 								orderItemName.setTextColor(Color.RED);
-								orderItemName.setTextSize(20.0f);
+								orderItemName.setTextSize(12.0f);
 								
 								orderItemQuantity.setText(String.valueOf(totalQuantity));
 								orderItemQuantity.setTextColor(Color.RED);
-								orderItemQuantity.setTextSize(20.0f);
+								orderItemQuantity.setTextSize(12.0f);
 								
 								String priceData = this.mContext.getResources().getString(R.string.menu_order_item_price);
 								orderItemPrice.setText(String.format(priceData, totalPrice));
 								orderItemPrice.setTextColor(Color.RED);
-								orderItemPrice.setTextSize(20.0f);
+								orderItemPrice.setTextSize(12.0f);
 								
 								Date d = new Date((long)orderDataList.getJSONObject(0).getInt("o_update_time") * 1000L);
 								SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
 								orderItemTime.setText(sf.format(d));
 								orderItemTime.setTextColor(Color.RED);
-								orderItemTime.setTextSize(20.0f);
+								orderItemTime.setTextSize(12.0f);
 								
 								menuOrderSvLayout.addView(orderItemView);
 							}
@@ -613,9 +613,17 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 	public void showBigImage(String imgBase64Str) {
 		Bitmap bitmap = Commons.stringToBitmap(imgBase64Str);
 		Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);
-	
+		
+		//这里不使用公用方法
+		DisplayMetrics displayMetrics = new DisplayMetrics();
+		((Activity)this.mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+		float w = (float)displayMetrics.widthPixels * displayMetrics.density;
+		float h = w * 0.7f; //比例是10比7
+
+		Drawable bigImgDrawable = Commons.zoomDrawable(d, (int)(w * 0.75f), (int)(h * 0.75f));
+		
 		ImageView bigImg = (ImageView)AppConnHandler.this.mMaskView.findViewById(R.id.menu_detail_big_img);
-		bigImg.setImageDrawable(d);		
+		bigImg.setImageDrawable(bigImgDrawable);
 	}
 	
 	//显示小图
@@ -629,7 +637,9 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 																
 				Bitmap bitmap = Commons.stringToBitmap(imgBase64Str);
 				Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);			
-				Drawable samllImgDrawable = Commons.zoomDrawable(d, Commons.getSamllImgSize(d.getIntrinsicWidth()), Commons.getSamllImgSize(d.getIntrinsicHeight()));
+				
+				Drawable samllImgDrawable = Commons.zoomDrawable(d, (int)Commons.computeX((Activity)this.mContext, 1800.0f), (int)Commons.computeY((Activity)this.mContext, 1200.0f));
+				
 				ImageView samllImg = (ImageView)menuItem.findViewById(R.id.menu_item_small_img);
 				samllImg.setImageDrawable(samllImgDrawable);
 				

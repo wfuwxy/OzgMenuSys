@@ -2,7 +2,7 @@ package com.ozg.menusys;
 
 public class AppConfig {
 	
-	public static String SERV = "ws://192.168.1.10:8765";
+	public static String SERV = "ws://192.168.1.101:8765";
 	public static String[] PROTOCOLS = { "echo-protocol" };
 	
 	public static long IMG_CACHE_TIMEOUT = 86400000; //图片缓存的超时时间
