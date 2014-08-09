@@ -268,7 +268,11 @@ public class MenuActivity extends BaseActivity {
 		if(this.mProgressView == null) {
 			RelativeLayout mainRoot = (RelativeLayout)this.findViewById(R.id.menu_root);
 			
-			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(96, 96);		
+			DisplayMetrics displayMetrics = new DisplayMetrics();
+			this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+			
+			int val = (int)(32.0f * displayMetrics.density);
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(val, val);		
 			
 			DisplayMetrics dm = new DisplayMetrics();getWindowManager().getDefaultDisplay().getMetrics(dm);
 		    
