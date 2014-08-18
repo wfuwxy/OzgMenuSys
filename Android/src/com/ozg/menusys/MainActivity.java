@@ -72,9 +72,8 @@ public class MainActivity extends BaseActivity {
 //	    	getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
 //	    	int w = mDisplayMetrics.widthPixels;
 //	    	int h = mDisplayMetrics.heightPixels;
-	    	//Log.d("ozg test", "echo " + String.valueOf(w));
-	    	//Log.d("ozg test", "echo " + String.valueOf(h));
-	    	//Commons.alertErrMsg(this, "width " + String.valueOf(w) + " height " + String.valueOf(h));
+//	    	
+//	    	Commons.alertErrMsg(this, "density " + String.valueOf(mDisplayMetrics.density) + " width " + String.valueOf(w) + " height " + String.valueOf(h));
 	    	
 			//socket相关
 			ConnHelper.getConnInstance(this);

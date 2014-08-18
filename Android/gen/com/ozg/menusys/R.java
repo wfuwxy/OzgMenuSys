@@ -37,7 +37,7 @@ public final class R {
         public static final int loading12=0x7f02000d;
     }
     public static final class id {
-        public static final int action_settings=0x7f080021;
+        public static final int action_settings=0x7f080023;
         public static final int btn_order=0x7f080008;
         public static final int btn_payment=0x7f080009;
         public static final int lab_name=0x7f080007;
@@ -55,21 +55,23 @@ public final class R {
         public static final int menu_detail_lab_price=0x7f080010;
         public static final int menu_item_lab_name=0x7f080012;
         public static final int menu_item_lab_price=0x7f080013;
-        public static final int menu_item_lab_small_img=0x7f080014;
+        public static final int menu_item_lab_small_img=0x7f080015;
+        public static final int menu_item_separate=0x7f080014;
         public static final int menu_item_small_img=0x7f080011;
         public static final int menu_left=0x7f080004;
-        public static final int menu_list_root=0x7f080015;
-        public static final int menu_list_root_layout=0x7f080016;
-        public static final int menu_order_item_name=0x7f080018;
-        public static final int menu_order_item_price=0x7f08001a;
-        public static final int menu_order_item_quantity=0x7f080019;
-        public static final int menu_order_item_root=0x7f080017;
-        public static final int menu_order_item_time=0x7f08001b;
-        public static final int menu_order_list_root=0x7f08001c;
-        public static final int menu_order_list_title=0x7f08001d;
-        public static final int menu_order_sv=0x7f08001e;
-        public static final int menu_order_sv_layout=0x7f08001f;
-        public static final int menu_payment_result_lab_msg=0x7f080020;
+        public static final int menu_list_root=0x7f080016;
+        public static final int menu_list_root_layout=0x7f080017;
+        public static final int menu_order_item_name=0x7f080019;
+        public static final int menu_order_item_price=0x7f08001b;
+        public static final int menu_order_item_quantity=0x7f08001a;
+        public static final int menu_order_item_root=0x7f080018;
+        public static final int menu_order_item_time=0x7f08001c;
+        public static final int menu_order_list_root=0x7f08001d;
+        public static final int menu_order_list_title=0x7f08001e;
+        public static final int menu_order_list_title_time=0x7f08001f;
+        public static final int menu_order_sv=0x7f080020;
+        public static final int menu_order_sv_layout=0x7f080021;
+        public static final int menu_payment_result_lab_msg=0x7f080022;
         public static final int menu_root=0x7f080003;
     }
     public static final class layout {

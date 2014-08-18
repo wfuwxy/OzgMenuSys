@@ -341,6 +341,7 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								View classItem = View.inflate(this.mContext, R.layout.menu_class_item, null);
 								Button classBtn = (Button)classItem.findViewById(R.id.menu_class_item_root).findViewById(R.id.menu_class_item_btn);
 								classBtn.setText(item.getString("name"));
+								classBtn.setHeight(40);
 								classBtn.setOnClickListener(l);
 								
 								//选定一个分类
@@ -422,7 +423,20 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								TextView labPrice = (TextView)menuItem.findViewById(R.id.menu_item_lab_price);
 								labPrice.setText(String.format(priceData, (float)item.getDouble("price")));
 								labPrice.setGravity(Gravity.RIGHT);
-															
+								
+								//定死各种屏幕的位置
+								DisplayMetrics displayMetrics = new DisplayMetrics();
+								((Activity)this.mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+								if(displayMetrics.density == 2.5) {
+									((RelativeLayout.LayoutParams)labName.getLayoutParams()).topMargin = 650;
+																		
+									((RelativeLayout.LayoutParams)labPrice.getLayoutParams()).leftMargin = 300;		
+									((RelativeLayout.LayoutParams)labPrice.getLayoutParams()).topMargin = 650;	
+									
+									View separate = menuItem.findViewById(R.id.menu_item_separate);
+									((RelativeLayout.LayoutParams)separate.getLayoutParams()).leftMargin += 120;
+								}
+								
 								((MenuActivity)AppConnHandler.this.mContext).getSmallImage(item.getInt("id"), item.getString("name"), (float)item.getDouble("price"), item.getString("small_img"));
 								
 							}
@@ -453,6 +467,10 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								this.mCurrShowMainView = null;
 							}
 							
+							//屏幕太小就不显示时间了
+							DisplayMetrics displayMetrics = new DisplayMetrics();
+							((Activity)this.mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+							
 							RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(2000, 1200);		
 							lp.leftMargin = (int)Commons.computeX((Activity)this.mContext, 700.0f);
 							lp.topMargin = 0;
@@ -461,6 +479,10 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 							lp.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);	
 															
 							this.mCurrShowMainView = View.inflate(this.mContext, R.layout.menu_order_list, null);
+							
+							//屏幕太小就不显示时间了
+							if(displayMetrics.density <= 1.0f)
+								this.mCurrShowMainView.findViewById(R.id.menu_order_list_title_time).setVisibility(View.GONE);
 							
 							//固定索引是为了确保显示在进度条的下面
 							menuRoot.addView(this.mCurrShowMainView, 1, lp);
@@ -494,6 +516,10 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								SimpleDateFormat sf = new SimpleDateFormat("HH:mm:ss");
 								orderItemTime.setText(sf.format(d));
 								
+								//屏幕太小就不显示时间了
+								if(displayMetrics.density <= 1.0f)
+									orderItemTime.setVisibility(View.GONE);
+								
 								menuOrderSvLayout.addView(orderItemView);
 							}
 							
@@ -523,6 +549,10 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 								orderItemTime.setText(sf.format(d));
 								orderItemTime.setTextColor(Color.RED);
 								orderItemTime.setTextSize(12.0f);
+								
+								//屏幕太小就不显示时间了
+								if(displayMetrics.density <= 1.0f)
+									orderItemTime.setVisibility(View.GONE);
 								
 								menuOrderSvLayout.addView(orderItemView);
 							}
@@ -638,7 +668,17 @@ public class AppConnHandler extends WebSocketConnectionHandler {
 				Bitmap bitmap = Commons.stringToBitmap(imgBase64Str);
 				Drawable d = new BitmapDrawable(this.mContext.getResources(), bitmap);			
 				
-				Drawable samllImgDrawable = Commons.zoomDrawable(d, (int)Commons.computeX((Activity)this.mContext, 1800.0f), (int)Commons.computeY((Activity)this.mContext, 1200.0f));
+				Drawable samllImgDrawable;
+				
+				//固定各种屏幕的大小
+				DisplayMetrics displayMetrics = new DisplayMetrics();
+				((Activity)this.mContext).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+				if(displayMetrics.density == 1.0f)				
+					samllImgDrawable = Commons.zoomDrawable(d, (int)Commons.computeX((Activity)this.mContext, 1200.0f), (int)Commons.computeY((Activity)this.mContext, 800.0f));
+				else if(displayMetrics.density == 2.5f)
+					samllImgDrawable = Commons.zoomDrawable(d, (int)Commons.computeX((Activity)this.mContext, 2400.0f), (int)Commons.computeY((Activity)this.mContext, 1600.0f));
+				else
+					samllImgDrawable = Commons.zoomDrawable(d, (int)Commons.computeX((Activity)this.mContext, 1800.0f), (int)Commons.computeY((Activity)this.mContext, 1200.0f));
 				
 				ImageView samllImg = (ImageView)menuItem.findViewById(R.id.menu_item_small_img);
 				samllImg.setImageDrawable(samllImgDrawable);
