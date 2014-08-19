@@ -129,9 +129,24 @@ wsServer.on("request", function(request) {
 				serverdb.onlineList(connection);				
 
 			}
+			else if(inputObj.cmd == cmd.SERV_ORDER_DETAIL) {
+				//下单明细列表
+				serverdb.orderDetailList(connection);
+
+			}
+			else if(inputObj.cmd == cmd.SERV_ORDER_DETAIL_CHANGE_STATUS) {
+				//更新一个订单明细的状态（将状态改为1）
+				serverdb.orderDetailChangeStatus(connection, inputObj.data);
+
+			}
 			else if(inputObj.cmd == cmd.SERV_REPORT_DAY) {
 				//日报表数据
 				serverdb.reportDay(connection, inputObj.data.time_from, inputObj.data.time_to);				
+
+			}
+			else if(inputObj.cmd == cmd.SERV_REPORT_MONTH) {
+				//月报表数据
+				serverdb.reportMonth(connection, inputObj.data.time_from, inputObj.data.time_to);				
 
 			}
 			else if(inputObj.cmd == cmd.SERV_CLIENT_LIST) {
@@ -168,7 +183,7 @@ wsServer.on("request", function(request) {
 				//删除菜单数据
 				serverdb.menuDelete(connection, inputObj.data);				
 
-			}
+			}			
 			else {
 				//命令参数错误
 				console.log(strings.COMMONS_MSG1);

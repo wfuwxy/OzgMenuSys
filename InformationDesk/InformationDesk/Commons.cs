@@ -14,7 +14,11 @@ namespace InformationDesk
 
         public static DateTime UnixTimeFrom(long timeStamp)
         {
-            return DateTime.Parse("1970-01-01 00:00:00").AddSeconds(timeStamp);
+            //return DateTime.Parse("1970-01-01 00:00:00").AddSeconds(timeStamp);
+
+            timeStamp *= 1000;
+            long timeTricks = new DateTime(1970, 1, 1).Ticks + timeStamp * 10000 + TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).Hours * 3600 * (long)10000000;
+            return new DateTime(timeTricks);
         }
 
         public static long UnixTimeTo(DateTime dateTime)

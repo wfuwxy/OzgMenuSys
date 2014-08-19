@@ -65,6 +65,17 @@ function writeDbData(connection, sql, cmdStr) {
 	});
 }
 
+//公用方法不用exports
+function getOrderDetailData(connection) {
+	var sql = "select od.*, c.name as c_name from order_detail as od inner join `order` as o on od.order_id = o.id inner join client as c on o.client_id = c.id where o.status = 0 order by id asc limit 50";
+					
+	db.all(sql, function(err, rows) {
+		
+		outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_ORDER_DETAIL, rows);			
+		connection.sendUTF(outputStr);
+	});
+}
+
 //有链接时调用
 exports.checkClient = function(connection) {
 	
@@ -268,9 +279,12 @@ exports.addOrderDetail = function(connection, menuId, quantity) {
 					connection.sendUTF(outputStr);
 
 					//向服务台发出响应数据
-					//刷新服务台的数据
+					//刷新服务台的在线列表数据（该列表有消费总价格）
 					outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_GET_ONLINE_LIST);
 					writeInformationDeskData(outputStr);
+					
+					//刷新服务台的菜单明细列表数据
+					getOrderDetailData(connection);
 
 				});
 			});
@@ -503,11 +517,62 @@ exports.onlineList = function(connection) {
 	});
 };
 
+exports.orderDetailList = function(connection) {
+	//下单明细列表
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				getOrderDetailData(connection);
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+exports.orderDetailChangeStatus = function(connection, dataId) {
+	//更新一个订单明细的状态（将状态改为1）
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				var sql = "update order_detail set status = 1 where id = " + dataId;
+				db.run(sql);
+				
+				getOrderDetailData(connection);
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
 //日报表数据用到
 var reportDayData = null;
 function getReportDay(connection, timeFrom, timeTo) {
 	
-	if(timeFrom < timeTo) {
+	if(timeFrom <= timeTo) {
 		var tmpTimeTo = timeFrom + 86400;
 		var sql = "select count(t.id) as total, sum(t.quantity) as total_quantity, sum(t.price) as total_price from (select o.id, o.add_time, sum(od.price) as price, sum(od.quantity) as quantity from `order` as o left join order_detail as od on o.id = od.order_id where o.add_time >= " + timeFrom + " and o.add_time <= " + tmpTimeTo + " group by od.order_id) as t";
 
@@ -515,13 +580,15 @@ function getReportDay(connection, timeFrom, timeTo) {
 
 			if(reportDayData == null)
 				reportDayData = new Array();
-
-			var reportDayItem = {};
-			reportDayItem.total = row.total;
-			reportDayItem.total_quantity = row.total_quantity;
-			reportDayItem.total_price = row.total_price;
-			reportDayItem.time = timeFrom;
-			reportDayData.push(reportDayItem);
+			
+			if(row.total_price) {
+				var reportDayItem = {};
+				reportDayItem.total = row.total;
+				reportDayItem.total_quantity = row.total_quantity;
+				reportDayItem.total_price = row.total_price;
+				reportDayItem.time = timeFrom;
+				reportDayData.push(reportDayItem);
+			}
 
 			timeFrom = tmpTimeTo;
 			getReportDay(connection, timeFrom, timeTo);
@@ -544,6 +611,69 @@ exports.reportDay = function(connection, timeFrom, timeTo) {
 			if(row.is_admin == 1) {
 				
 				getReportDay(connection, timeFrom, timeTo);
+			}
+			else {
+				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));
+				connection.sendUTF(outputStr);
+			}
+			
+		}
+		else {
+			//查询不到数据
+			
+			writeErrorIp(connection);
+		}
+
+	});
+};
+
+//月报表数据用到
+var reportMonthData = null;
+function getReportMonth(connection, timeFrom, timeTo) {
+	
+	if(timeFrom <= timeTo) {
+		var d = new Date(timeFrom * 1000);
+		d.setMonth(d.getMonth() + 1);
+		
+		var tmpTimeTo = d.getTime() / 1000;
+
+		var sql = "select count(t.id) as total, sum(t.quantity) as total_quantity, sum(t.price) as total_price from (select o.id, o.add_time, sum(od.price) as price, sum(od.quantity) as quantity from `order` as o left join order_detail as od on o.id = od.order_id where o.add_time >= " + timeFrom + " and o.add_time <= " + tmpTimeTo + " group by od.order_id) as t";
+
+		db.get(sql, function(err, row) {
+
+			if(reportMonthData == null)
+				reportMonthData = new Array();
+			
+			if(row.total_price) {
+				var reportMonthItem = {};
+				reportMonthItem.total = row.total;
+				reportMonthItem.total_quantity = row.total_quantity;
+				reportMonthItem.total_price = row.total_price;
+				reportMonthItem.time = timeFrom;
+				reportMonthData.push(reportMonthItem);
+			}
+
+			timeFrom = tmpTimeTo;
+			getReportMonth(connection, timeFrom, timeTo);
+		});
+	}
+	else {
+		var outputStr = commons.outputJsonStr(1, null, cmd.CLIENT_WANT_REPORT_MONTH, reportMonthData);
+		connection.sendUTF(outputStr);
+
+		reportMonthData = null;
+	}
+	
+}
+
+exports.reportMonth = function(connection, timeFrom, timeTo) {
+	//月报表数据
+	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
+		if(row != undefined && row) {
+									
+			if(row.is_admin == 1) {
+				
+				getReportMonth(connection, timeFrom, timeTo);
 			}
 			else {
 				var outputStr = commons.outputJsonStr(0, commons.format(strings.CHECK_MSG4, connection.remoteAddress));

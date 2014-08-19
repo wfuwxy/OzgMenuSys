@@ -19,10 +19,19 @@ namespace InformationDesk
         public static string MainFormConnectedTitle = "Ozg点餐系统-服务台（链接中）";
         public static string MainFormDialogOpenClientMsg1 = "确认开通[{0}]！";
         public static string MainFormDialogOpenClientMsg2 = "确认归档[{0}]的订单！";
-        public static string MainFormListTitle1 = "名称";
-        public static string MainFormListTitle2 = "IP";
-        public static string MainFormListTitle3 = "类别";
-        public static string MainFormListTitle4 = "状态";
+        public static string MainFormOnlineListTitle1 = "名称";
+        public static string MainFormOnlineListTitle2 = "IP";
+        public static string MainFormOnlineListTitle3 = "类别";
+        public static string MainFormOnlineListTitle4 = "状态";
+        public static string MainFormOrderDetailListTitle1 = "客户端名称";
+        public static string MainFormOrderDetailListTitle2 = "菜单名称";
+        public static string MainFormOrderDetailListTitle3 = "单价";
+        public static string MainFormOrderDetailListTitle4 = "个数";
+        public static string MainFormOrderDetailListTitle5 = "时间";
+        public static string MainFormOrderDetailListTitle6 = "状态";
+        public static string MainFormOrderDetailStatus0 = "未上菜";
+        public static string MainFormOrderDetailStatus1 = "已上菜";
+        public static string MainFormOrderDetailDialogMsg = "确认将[{0}]修改为[已上菜]状态！";
         public static string MainFormInformationDeskName = "服务台";
         public static string MainFormInformationDeskStatus = "运行中";
         public static string MainFormClientStatus = "正在空闲";
@@ -67,6 +76,12 @@ namespace InformationDesk
         public static string OrderDayReportFormListTitle2 = "订单数";
         public static string OrderDayReportFormListTitle3 = "上菜数";
         public static string OrderDayReportFormListTitle4 = "销售总额";
+
+        public static string OrderMonthReportFormTitle = "Ozg点餐系统-订单月报表";
+        public static string OrderMonthReportFormListTitle1 = "月份";
+        public static string OrderMonthReportFormListTitle2 = "订单数";
+        public static string OrderMonthReportFormListTitle3 = "上菜数";
+        public static string OrderMonthReportFormListTitle4 = "销售总额";
 
         public static string AboutFormTitle = "关于 Ozg点餐系统";
         public static string AboutFormLabContent = "Ozg点餐系统 Ver {0}";

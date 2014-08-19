@@ -18,7 +18,12 @@ namespace InformationDesk
         private Dictionary<int, string> ClientNameList; //一般客户端的名称列表
         private Dictionary<int, int> ClientOrderStatusList; //一般客户端的订单状态列表
         private Dictionary<int, int> ClientStatusList; //一般客户端的状态列表
-        private int ListSelectedIndex = -1; //保存选定项的索引
+        private int ClientListSelectedIndex = -1; //保存选定项的索引
+
+        private List<int> OrderDetailIDList; //下单明细列表的id
+        private List<int> OrderDetailStatusList; //下单明细列表的状态值
+        private List<string> OrderDetailNameList; //下单明细列表的名称
+        private int OrderDetailListSelectedIndex = -1; //保存选定项的索引
 
         private Form SubForm = null;
 
@@ -39,11 +44,20 @@ namespace InformationDesk
             this.OnlineList.SmallImageList = imageList;
 
             this.OnlineList.Columns.Add("", 0);
-            this.OnlineList.Columns.Add(Strings.MainFormListTitle1, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.OnlineList.Columns.Add(Strings.MainFormListTitle2, 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.OnlineList.Columns.Add(Strings.MainFormListTitle3, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.OnlineList.Columns.Add(Strings.MainFormListTitle4, 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormOnlineListTitle1, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormOnlineListTitle2, 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormOnlineListTitle3, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OnlineList.Columns.Add(Strings.MainFormOnlineListTitle4, 160).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
 
+            this.OrderDetailList.SmallImageList = imageList;
+
+            this.OrderDetailList.Columns.Add("", 0);
+            this.OrderDetailList.Columns.Add(Strings.MainFormOrderDetailListTitle1, 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OrderDetailList.Columns.Add(Strings.MainFormOrderDetailListTitle2, 120).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OrderDetailList.Columns.Add(Strings.MainFormOrderDetailListTitle3, 70).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OrderDetailList.Columns.Add(Strings.MainFormOrderDetailListTitle4, 70).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OrderDetailList.Columns.Add(Strings.MainFormOrderDetailListTitle5, 100).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.OrderDetailList.Columns.Add(Strings.MainFormOrderDetailListTitle6, 60).TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -79,9 +93,16 @@ namespace InformationDesk
             this.SubForm = null;
         }
 
-        private void OrderReportToolStripMenuItem_Click(object sender, EventArgs e)
+        private void OrderDayReportToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.SubForm = new OrderDayReportForm(this.Connection);
+            this.SubForm.ShowDialog();
+            this.SubForm = null;
+        }
+
+        private void OrderMonthReportToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.SubForm = new OrderMonthReportForm(this.Connection);
             this.SubForm.ShowDialog();
             this.SubForm = null;
         }
@@ -115,6 +136,8 @@ namespace InformationDesk
                 {
                     if (this.SubForm is OrderDayReportForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_REPORT_DAY))                    
                         ((OrderDayReportForm)this.SubForm).ShowData(e.Message); //订单日报表
+                    else if (this.SubForm is OrderMonthReportForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_REPORT_MONTH))
+                        ((OrderMonthReportForm)this.SubForm).ShowData(e.Message); //订单月报表
                     else if (this.SubForm is ClientForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_CLIENT_LIST))
                         ((ClientForm)this.SubForm).ShowData(e.Message); //客户端管理
                     else if (this.SubForm is MenuClassForm && ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_MENU_CLASS))
@@ -135,10 +158,19 @@ namespace InformationDesk
 
                 if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_TOMAIN) || ((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_GET_ONLINE_LIST))
                 {
-                    //发送获取在线列表的请求
-                    jsonData = new JsonObjectCollection();
-                    jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_ONLINE_LIST));
-                    ConnHelper.SendString(jsonData.ToString());
+                    { 
+                        //发送获取在线列表的请求
+                        jsonData = new JsonObjectCollection();
+                        jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_ONLINE_LIST));
+                        ConnHelper.SendString(jsonData.ToString());
+                    }
+                    
+                    {
+                        //获取下单明细列表
+                        jsonData = new JsonObjectCollection();
+                        jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_ORDER_DETAIL));
+                        ConnHelper.SendString(jsonData.ToString());
+                    }
                 }
                 else if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_ONLINE_LIST))
                 { 
@@ -192,10 +224,42 @@ namespace InformationDesk
                         
                     }
 
-                    if (this.ListSelectedIndex > -1)
-                        this.OnlineList.Items[this.ListSelectedIndex].Selected = true;
+                    if (this.ClientListSelectedIndex > -1)
+                        this.OnlineList.Items[this.ClientListSelectedIndex].Selected = true;
 
                 }
+                else if (((JsonStringValue)jsonData["cmd"]).Value.Equals(AppConfig.CLIENT_WANT_ORDER_DETAIL))
+                {
+                    //下单明细列表
+
+                    this.OrderDetailIDList = new List<int>();
+                    this.OrderDetailStatusList = new List<int>();
+                    this.OrderDetailNameList = new List<string>();
+
+                    this.OrderDetailList.Items.Clear();
+                    JsonArrayCollection data = (JsonArrayCollection)jsonData["data"];
+
+                    for (int i = 0; i < data.Count; i++)
+                    {
+                        JsonObjectCollection itemData = (JsonObjectCollection)data[i];
+
+                        string status = Strings.MainFormOrderDetailStatus0;
+                        if((int)((JsonNumericValue)itemData["status"]).Value == 1)
+                            status = Strings.MainFormOrderDetailStatus1;
+
+                        this.OrderDetailIDList.Add((int)((JsonNumericValue)itemData["id"]).Value);
+                        this.OrderDetailStatusList.Add((int)((JsonNumericValue)itemData["status"]).Value);
+                        this.OrderDetailNameList.Add(((JsonStringValue)itemData["menu_name"]).Value);
+
+                        ListViewItem item = new ListViewItem(new string[] { "", ((JsonStringValue)itemData["c_name"]).Value, ((JsonStringValue)itemData["menu_name"]).Value, ((float)((JsonNumericValue)itemData["price"]).Value).ToString("f1"), ((int)((JsonNumericValue)itemData["quantity"]).Value).ToString(), Commons.UnixTimeFrom((long)((JsonNumericValue)itemData["add_time"]).Value).ToString("HH:mm:ss"), status });
+                        this.OrderDetailList.Items.Add(item);
+                    }
+
+                    if (this.OrderDetailListSelectedIndex > -1)
+                        this.OrderDetailList.Items[this.OrderDetailListSelectedIndex].Selected = true;
+
+                }
+
             }
             else
                 MessageBox.Show(((JsonStringValue)jsonData["message"]).Value);
@@ -215,15 +279,16 @@ namespace InformationDesk
                 if (this.OnlineList.SelectedItems.Count == 1)
                 {
                     //确保只选中一个
+
                     if (!this.InformationDeskIndices.Contains(this.OnlineList.SelectedItems[0].Index))
                     {
-                        this.ListSelectedIndex = this.OnlineList.SelectedItems[0].Index;
+                        this.ClientListSelectedIndex = this.OnlineList.SelectedItems[0].Index;
 
                         //客户端状态：0为空闲中，1为开通中
-                        if (this.ClientStatusList[this.ListSelectedIndex] == 0)
+                        if (this.ClientStatusList[this.ClientListSelectedIndex] == 0)
                         {
                             //弹出开通确认框
-                            DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg1, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                            DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg1, this.ClientNameList[this.ClientListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
                             if (res == DialogResult.OK)
                             {
                                 JsonObjectCollection jsonData = new JsonObjectCollection();
@@ -235,10 +300,10 @@ namespace InformationDesk
                         else
                         {
                             //订单状态：0为消费中，1为结账中，2为已归档
-                            if (this.ClientOrderStatusList[this.ListSelectedIndex] == 1)
+                            if (this.ClientOrderStatusList[this.ClientListSelectedIndex] == 1)
                             {
                                 //已结账中的时候，弹出归档确认框
-                                DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg2, this.ClientNameList[this.ListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                                DialogResult res = MessageBox.Show(string.Format(Strings.MainFormDialogOpenClientMsg2, this.ClientNameList[this.ClientListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
                                 if (res == DialogResult.OK)
                                 {
                                     JsonObjectCollection jsonData = new JsonObjectCollection();
@@ -253,6 +318,31 @@ namespace InformationDesk
                 }
             }
                         
+        }
+
+        private void OrderDetailList_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                if (this.OrderDetailList.SelectedItems.Count == 1)
+                {
+                    this.OrderDetailListSelectedIndex = this.OrderDetailList.SelectedItems[0].Index;
+                    if (this.OrderDetailStatusList[this.OrderDetailListSelectedIndex] == 0)
+                    {
+                        //弹出开通确认框
+                        DialogResult res = MessageBox.Show(string.Format(Strings.MainFormOrderDetailDialogMsg, this.OrderDetailNameList[this.OrderDetailListSelectedIndex]), Strings.CommonsDialogTitle, MessageBoxButtons.OKCancel);
+                        if (res == DialogResult.OK)
+                        {
+                            JsonObjectCollection jsonData = new JsonObjectCollection();
+                            jsonData.Add(new JsonStringValue("cmd", AppConfig.SERV_ORDER_DETAIL_CHANGE_STATUS));
+                            jsonData.Add(new JsonNumericValue("data", this.OrderDetailIDList[this.OrderDetailListSelectedIndex]));
+                            ConnHelper.SendString(jsonData.ToString());
+                        }
+                    }
+
+                }
+            }
+
         }
 
     }

@@ -38,11 +38,13 @@
             this.ClientToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.ClientListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OrderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.OrderReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OrderDayReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OrderMonthReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.HelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.AboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.OnlineList = new System.Windows.Forms.ListView();
             this.ClientItemMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.OrderDetailList = new System.Windows.Forms.ListView();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,7 +58,7 @@
             this.HelpToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(634, 25);
+            this.menuStrip1.Size = new System.Drawing.Size(1184, 25);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -116,17 +118,25 @@
             // OrderToolStripMenuItem
             // 
             this.OrderToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.OrderReportToolStripMenuItem});
+            this.OrderDayReportToolStripMenuItem,
+            this.OrderMonthReportToolStripMenuItem});
             this.OrderToolStripMenuItem.Name = "OrderToolStripMenuItem";
             this.OrderToolStripMenuItem.Size = new System.Drawing.Size(62, 21);
             this.OrderToolStripMenuItem.Text = "订单(O)";
             // 
-            // OrderReportToolStripMenuItem
+            // OrderDayReportToolStripMenuItem
             // 
-            this.OrderReportToolStripMenuItem.Name = "OrderReportToolStripMenuItem";
-            this.OrderReportToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
-            this.OrderReportToolStripMenuItem.Text = "订单日销售报表";
-            this.OrderReportToolStripMenuItem.Click += new System.EventHandler(this.OrderReportToolStripMenuItem_Click);
+            this.OrderDayReportToolStripMenuItem.Name = "OrderDayReportToolStripMenuItem";
+            this.OrderDayReportToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.OrderDayReportToolStripMenuItem.Text = "订单日销售报表";
+            this.OrderDayReportToolStripMenuItem.Click += new System.EventHandler(this.OrderDayReportToolStripMenuItem_Click);
+            // 
+            // OrderMonthReportToolStripMenuItem
+            // 
+            this.OrderMonthReportToolStripMenuItem.Name = "OrderMonthReportToolStripMenuItem";
+            this.OrderMonthReportToolStripMenuItem.Size = new System.Drawing.Size(160, 22);
+            this.OrderMonthReportToolStripMenuItem.Text = "订单月销售报表";
+            this.OrderMonthReportToolStripMenuItem.Click += new System.EventHandler(this.OrderMonthReportToolStripMenuItem_Click);
             // 
             // HelpToolStripMenuItem
             // 
@@ -150,7 +160,7 @@
             this.OnlineList.Location = new System.Drawing.Point(13, 29);
             this.OnlineList.MultiSelect = false;
             this.OnlineList.Name = "OnlineList";
-            this.OnlineList.Size = new System.Drawing.Size(609, 350);
+            this.OnlineList.Size = new System.Drawing.Size(609, 720);
             this.OnlineList.TabIndex = 1;
             this.OnlineList.UseCompatibleStateImageBehavior = false;
             this.OnlineList.View = System.Windows.Forms.View.Details;
@@ -161,17 +171,30 @@
             this.ClientItemMenuStrip.Name = "ClientItemMenuStrip";
             this.ClientItemMenuStrip.Size = new System.Drawing.Size(61, 4);
             // 
+            // OrderDetailList
+            // 
+            this.OrderDetailList.FullRowSelect = true;
+            this.OrderDetailList.GridLines = true;
+            this.OrderDetailList.Location = new System.Drawing.Point(628, 29);
+            this.OrderDetailList.MultiSelect = false;
+            this.OrderDetailList.Name = "OrderDetailList";
+            this.OrderDetailList.Size = new System.Drawing.Size(544, 720);
+            this.OrderDetailList.TabIndex = 2;
+            this.OrderDetailList.UseCompatibleStateImageBehavior = false;
+            this.OrderDetailList.View = System.Windows.Forms.View.Details;
+            this.OrderDetailList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.OrderDetailList_MouseClick);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(634, 391);
+            this.ClientSize = new System.Drawing.Size(1184, 761);
+            this.Controls.Add(this.OrderDetailList);
             this.Controls.Add(this.OnlineList);
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "MainForm";
             this.Text = "MainForm";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -194,9 +217,11 @@
         private System.Windows.Forms.ToolStripMenuItem MenuClassToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem MenuDataToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ClientListToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem OrderReportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem OrderDayReportToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem AboutToolStripMenuItem;
         private System.Windows.Forms.ListView OnlineList;
         private System.Windows.Forms.ContextMenuStrip ClientItemMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem OrderMonthReportToolStripMenuItem;
+        private System.Windows.Forms.ListView OrderDetailList;
     }
 }
