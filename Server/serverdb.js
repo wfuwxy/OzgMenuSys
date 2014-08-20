@@ -67,6 +67,8 @@ function writeDbData(connection, sql, cmdStr) {
 
 //公用方法不用exports
 function getOrderDetailData(connection) {
+	//返回订单明细列表，服务台用的
+	
 	var sql = "select od.*, c.name as c_name from order_detail as od inner join `order` as o on od.order_id = o.id inner join client as c on o.client_id = c.id where o.status = 0 order by id asc limit 50";
 					
 	db.all(sql, function(err, rows) {
