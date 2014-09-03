@@ -12,10 +12,9 @@ var db = new sqlite3.Database(cfg.DB_PATH);
 var chkClientSql = "select * from client where ip = '{0}' and status = 1";
 var chkClientSql2 = "select * from client where ip = '{0}'"; //检测订单是否归档的时候用到
 
-var clientList = new Array()
+var clientList = new Array();
 exports.clientList = clientList; //客户端列表，里面的元素是connection对象
 
-//公用方法不用exports
 function writeInformationDeskData(dataStr, isAdmin) {
 	//向客户端或服务台发出数据
 	
@@ -335,7 +334,7 @@ exports.orderPayment = function(connection) {
 					writeInformationDeskData(outputStr);
 				}
 				else {
-					var outputStr = commons.outputJsonStr(0, strings.MENU_PAYMENT_MSG2);
+					var outputStr = commons.outputJsonStr(0, strings.MENU_PAYMENT_MSG2, cmd.CLIENT_WANT_PAYMENT);
 					connection.sendUTF(outputStr);
 				}
 				
@@ -889,7 +888,7 @@ exports.menuClassDelete = function(connection, id) {
 };
 
 exports.menuAdd = function(connection, data) {
-	//增加或更新菜单分类数据
+	//增加或更新菜单数据
 	db.get(commons.format(chkClientSql, connection.remoteAddress), function(err, row) {
 		if(row != undefined && row) {
 									
@@ -905,7 +904,7 @@ exports.menuAdd = function(connection, data) {
 					bigImg = "upload/" + d.format("yyyyMMddhhmmss") + ".jpg";
 					smallImg = "upload/" + d.format("yyyyMMddhhmmss") + "_small.jpg";
 					
-					commons.fileBase64Decode(imgBase64Str, bigImg);
+					commons.fileBase64Decode(imgBase64Str, "./" + bigImg);
 
 					//缩小图片
 					im.resize({
@@ -913,10 +912,10 @@ exports.menuAdd = function(connection, data) {
 						width: 350,
 						height: 233
 					}, 
-					function(err, stdout, stderr){
+					function(err, stdout, stderr) {
 						if (err) throw err
 						fs.writeFileSync("./" + smallImg, stdout, "binary");
-						console.log("resized " + bigImg + " to fit within 350x233px")
+						console.log("resized " + bigImg + " to fit within 350x233px");
 					});
 
 				}
@@ -937,7 +936,6 @@ exports.menuAdd = function(connection, data) {
 					db.run(sql);
 				}
 				else {
-					var sql = null;
 					if(bigImg == null)
 						sql = "update menu set name = '" + menuData.name + "', price = " + menuData.price + ", class_id = " + menuData.class_id + " where id = " + menuData.id;
 					else

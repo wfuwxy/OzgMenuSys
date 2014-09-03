@@ -15,6 +15,16 @@ upload目录下的图片均来自互联网。
 
 ================
 
+Server_CoffeeScript目录为服务器端：
+
+功能同上面的一样，只是用CoffeeScript实现了同样的功能。
+
+需要安装coffee-script、sqlite3、websocket、imagemagick，然后将Server/upload、Server/db.sys复制到这个目录。
+
+服务器启动：cd OzgMenuSys/Server_CoffeeScript，coffee main.coffee。
+
+================
+
 Android目录为客户端：
 
 density为1.0、1.5、2.5的真机测试通过（没有使用模拟器测试）
