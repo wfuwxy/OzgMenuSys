@@ -12,21 +12,16 @@ ozg 点餐系统
 
 Server目录为服务器端：
 
-使用nodejs + sqlite3 + websocket，需要安装的库请查看node_modules目录的描述文件，服务器启动：cd OzgMenuSys/Server，node main.js。
+先安装imagemagick：http://www.imagemagick.org/ 
+
+cd到OzgMenuSys/Server，运行npm install
+
+服务器启动：node main.js。
 
 upload目录下的图片均来自互联网。
 
 上传服务端的大图为600*400的jpg。
 
-================
-
-Server_CoffeeScript目录为服务器端：
-
-功能同上面的一样，只是用CoffeeScript实现了同样的功能。
-
-需要安装coffee-script、sqlite3、websocket、imagemagick，然后将Server/upload、Server/db.sys复制到这个目录。
-
-服务器启动：cd OzgMenuSys/Server_CoffeeScript，coffee main.coffee。
 
 ================
 
