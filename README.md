@@ -48,6 +48,7 @@ AppConfig.cs里面的服务器IP和端口必须跟服务端相对应，client表
 ================
 
 运行状况：
+
 ![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot1.jpg)
 
 ![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot2.jpg)
