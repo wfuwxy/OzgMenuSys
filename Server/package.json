@@ -1,0 +1,27 @@
+{
+  "name": "OzgMenuSys",
+  "version": "1.0.0",
+  "description": "OzgMenuSys",
+  "main": "main.js",
+  "scripts": {
+    "test": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ouzhigang/OzgMenuSys"
+  },
+  "keywords": [
+    "OzgMenuSys"
+  ],
+  "author": "ozg",
+  "license": "GPL",
+  "bugs": {
+    "url": "https://github.com/ouzhigang/OzgMenuSys/issues"
+  },
+  "homepage": "https://github.com/ouzhigang/OzgMenuSys",
+  "dependencies": {
+    "sqlite3": "^3.1.2",
+	"websocket": "1.0.3",
+	"imagemagick": "0.1.3"
+  }
+}

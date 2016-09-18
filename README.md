@@ -1,27 +1,27 @@
 ozg 点餐系统
+
 ================
 
-本系统只适用于局域网（平板或相关设备替代纸质菜单）的场合，客户端需要设置固定IP，每一个客户端的IP对应服务端数据库client表的一条数据。
+本系统主要用于技术的研究和积累
+
+================
+
+客户端需要设置固定IP，每一个客户端的IP对应服务端数据库client表的一条数据。
 
 ================
 
 Server目录为服务器端：
 
-使用nodejs + sqlite3 + websocket，需要安装的库请查看node_modules目录的描述文件，服务器启动：cd OzgMenuSys/Server，node main.js。
+先安装imagemagick：http://www.imagemagick.org/ 
+
+cd到OzgMenuSys/Server，运行npm install
+
+服务器启动：node main.js。
 
 upload目录下的图片均来自互联网。
 
 上传服务端的大图为600*400的jpg。
 
-================
-
-Server_CoffeeScript目录为服务器端：
-
-功能同上面的一样，只是用CoffeeScript实现了同样的功能。
-
-需要安装coffee-script、sqlite3、websocket、imagemagick，然后将Server/upload、Server/db.sys复制到这个目录。
-
-服务器启动：cd OzgMenuSys/Server_CoffeeScript，coffee main.coffee。
 
 ================
 
@@ -48,6 +48,7 @@ AppConfig.cs里面的服务器IP和端口必须跟服务端相对应，client表
 ================
 
 运行状况：
+
 ![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot1.jpg)
 
 ![](https://raw.github.com/ouzhigang/OzgMenuSys/master/screenshot2.jpg)
